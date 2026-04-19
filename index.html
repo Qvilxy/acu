@@ -16,7 +16,7 @@
             height: 100%;
             width: 100%;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            overflow: hidden; /* Чтобы не было скролла во время загрузки */
+            overflow: hidden;
         }
 
         /* --- ЭКРАН ЗАГРУЗКИ --- */
@@ -37,10 +37,8 @@
         #loader-screen img {
             max-width: 80%;
             height: auto;
-            /* Можно добавить легкую анимацию появления/пульсации при желании */
         }
 
-        /* Класс для скрытия загрузчика */
         .hidden {
             opacity: 0;
             pointer-events: none;
@@ -48,27 +46,39 @@
 
         /* --- ОСНОВНОЙ ИНТЕРФЕЙС --- */
         #app-interface {
-            display: none; /* Скрыт по умолчанию */
+            display: none;
             width: 100%;
             min-height: 100vh;
-            background-color: #ffffff; /* Полностью белый фон страницы */
+            background-color: #ffffff;
         }
 
         /* Шапка */
         .header {
             height: 100px;
             width: 100%;
-            /* Градиент из двух цветов */
-            background: linear-gradient(45deg, #B255FF, #C177FF, #B255FF);
+            /* Градиент: Фиолетовый -> Очень светло-фиолетовый (почти белый) -> Фиолетовый */
+            background: linear-gradient(45deg, #8A2BE2, #F3E5F5, #8A2BE2);
             background-size: 200% 200%;
-            /* Анимация переливания */
-            animation: gradientShift 3s ease infinite;
+            animation: gradientShift 4s ease infinite;
             
             display: flex;
             justify-content: center;
             align-items: center;
             position: relative;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Легкая тень для объема, можно убрать */
+            overflow: hidden; /* Чтобы шум не вылезал */
+        }
+
+        /* Слой шума */
+        .header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.08; /* Прозрачность шума */
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
         @keyframes gradientShift {
@@ -78,15 +88,21 @@
         }
 
         .header-logo {
-            max-height: 80px; /* Ограничиваем высоту лого, чтобы влезало в шапку 100px */
-            max-width: 90%;
+            /* Базовые размеры можно оставить небольшими, так как мы увеличиваем через transform */
+            max-height: 50px; 
+            max-width: 50px;
             object-fit: contain;
+            
+            /* Увеличение в 4 раза и смещение вниз на 18px */
+            transform: scale(4) translateY(18px);
+            
+            /* Важно: сохраняем позицию по центру после трансформации */
+            position: relative;
+            z-index: 2; /* Поверх шума */
         }
 
-        /* Контентная часть (пустая, белая) */
         .content {
             padding: 20px;
-            /* Здесь будет остальной контент приложения */
         }
 
     </style>
@@ -105,9 +121,9 @@
             <img src="ballonygz.png" alt="Logo" class="header-logo">
         </header>
 
-        <!-- Основное содержимое (пока пустое) -->
+        <!-- Основное содержимое -->
         <main class="content">
-            <!-- Сюда можно добавлять блоки приложения -->
+            <!-- Контент приложения -->
         </main>
     </div>
 
@@ -116,15 +132,10 @@
             const loader = document.getElementById('loader-screen');
             const appInterface = document.getElementById('app-interface');
 
-            // Таймер на 3 секунды (3000 мс)
             setTimeout(() => {
-                // Начинаем скрывать загрузчик
                 loader.classList.add('hidden');
-                
-                // Показываем интерфейс
                 appInterface.style.display = 'block';
 
-                // Полностью удаляем загрузчик из DOM после завершения анимации исчезновения (0.5s)
                 setTimeout(() => {
                     loader.style.display = 'none';
                 }, 500);
