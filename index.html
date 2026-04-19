@@ -88,17 +88,17 @@
             background-image: url('image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyBAMAAADsEZWCAAAAGFBMVEUAAAA5OTkAAABMTExERERmZmYzMzMyMjJ4Oy/6AAAACHRSTlMAMwA3M2Y3ZpkN1u8AAAAJcEhZcwAADsQAAA7EAZUrDhsAAABBSURBVDjL7dExAQAgDMCw/396C2Ww0CqT5Jx0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHT0EL8A1wX/AK11j68AAAAASUVORK5CYII=');
         }
 
-        /* Логотип — теперь позиционируем абсолютно справа */
+        /* Логотип — ПО ЦЕНТРУ */
         .header-logo {
             position: absolute;
-            right: 20px; /* Отступ от правого края */
-            top: 50%;     /* По вертикали по центру шапки */
-            transform: translateY(-50%) scale(4) translateY(-15px); 
-            /* Объяснение трансформации:
-               - translateY(-50%) → центрируем по вертикали
-               - scale(4) → увеличиваем в 4 раза
-               - translateY(-15px) → поднимаем ещё на 15px вверх
-            */
+            left: 50%; /* Сдвигаем начало элемента на 50% ширины родителя */
+            top: 50%;  /* Сдвигаем верх элемента на 50% высоты родителя */
+            transform: translate(-50%, -50%) scale(4); /* Центрируем сам элемент и увеличиваем */
+            
+            /* Убрали лишние отступы и смещения */
+            margin: 0; 
+            right: auto; /* Сброс предыдущего позиционирования справа */
+            
             max-height: 40px;
             max-width: 40px;
             object-fit: contain;
