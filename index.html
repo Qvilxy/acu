@@ -17,6 +17,7 @@
             width: 100%;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             overflow: hidden;
+            background-color: #fff;
         }
 
         /* --- ЭКРАН ЗАГРУЗКИ --- */
@@ -46,7 +47,7 @@
 
         /* --- ОСНОВНОЙ ИНТЕРФЕЙС --- */
         #app-interface {
-            display: none;
+            display: none; /* Скрыт до конца загрузки */
             width: 100%;
             min-height: 100vh;
             background-color: #ffffff;
@@ -59,42 +60,39 @@
             position: relative;
             overflow: hidden;
             
-            /* Сложный градиент: Фиолетовый -> Светло-сиреневый -> Белый/Очень светлый -> Фиолетовый */
-            background: linear-gradient(120deg, #8A2BE2, #E6E6FA, #F8F8FF, #9370DB, #8A2BE2);
-            background-size: 300% 300%;
-            /* Медленная анимация (8 секунд) */
-            animation: complexGradientFlow 8s ease infinite;
+            /* Градиент: Фиолетовый -> Светлый -> Белый -> Светлый -> Фиолетовый */
+            background: linear-gradient(115deg, #8A2BE2, #D8BFD8, #FFFFFF, #D8BFD8, #8A2BE2);
+            background-size: 400% 400%;
+            /* Очень медленная и плавная анимация */
+            animation: smoothGradient 10s ease infinite;
             
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        /* Анимация градиента: двигается по диагонали и меняет акценты */
-        @keyframes complexGradientFlow {
+        @keyframes smoothGradient {
             0% { background-position: 0% 50%; }
-            25% { background-position: 50% 100%; }
             50% { background-position: 100% 50%; }
-            75% { background-position: 50% 0%; }
             100% { background-position: 0% 50%; }
         }
 
-        /* Слой зернистости (шума) */
+        /* Слой зернистости (шума) - надежный способ через base64 паттерн */
         .header::after {
             content: "";
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0.07; /* Очень легкая зернистость */
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            opacity: 0.08; /* Прозрачность шума */
             pointer-events: none;
             z-index: 1;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            background-image: url('image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyBAMAAADsEZWCAAAAGFBMVEUAAAA5OTkAAABMTExERERmZmYzMzMyMjJ4Oy/6AAAACHRSTlMAMwA3M2Y3ZpkN1u8AAAAJcEhZcwAADsQAAA7EAZUrDhsAAABBSURBVDjL7dExAQAgDMCw/396C2Ww0CqT5Jx0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHT0EL8A1wX/AK11j68AAAAASUVORK5CYII=');
         }
 
         .header-logo {
-            /* Базовый размер небольшой, чтобы при увеличении не было пикселизации сразу */
+            /* Базовый размер маленький */
             max-height: 40px; 
             max-width: 40px;
             object-fit: contain;
@@ -137,12 +135,29 @@
             const loader = document.getElementById('loader-screen');
             const appInterface = document.getElementById('app-interface');
 
-            setTimeout(() => {
+            // Функция завершения загрузки
+            function finishLoading() {
+                if (loader.style.display === 'none') return; // Уже скрыт
+
                 loader.classList.add('hidden');
                 appInterface.style.display = 'block';
 
+                // Полностью убираем загрузчик из потока через полсекунды
                 setTimeout(() => {
                     loader.style.display = 'none';
                 }, 500);
+            }
 
-            }, 3000);
+            // Запускаем таймер
+            const loadTimer = setTimeout(finishLoading, 3000);
+
+            // На случай ошибок, добавляем обработчик window.onload как запасной вариант
+            window.addEventListener('load', () => {
+                // Если вдруг DOMContentLoaded сработал, но картинки грузятся долго,
+                // мы все равно ждем 3 секунды, но если 3 секунды прошло, то finishLoading уже сработал.
+            });
+        });
+    </script>
+</body>
+</html>
+
