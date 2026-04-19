@@ -88,13 +88,15 @@
             background-image: url('image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyBAMAAADsEZWCAAAAGFBMVEUAAAA5OTkAAABMTExERERmZmYzMzMyMjJ4Oy/6AAAACHRSTlMAMwA3M2Y3ZpkN1u8AAAAJcEhZcwAADsQAAA7EAZUrDhsAAABBSURBVDjL7dExAQAgDMCw/396C2Ww0CqT5Jx0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHT0EL8A1wX/AK11j68AAAAASUVORK5CYII=');
         }
 
-        /* Логотип — ПО ЦЕНТРУ, опущен на 3px */
+        /* Логотип — ПО ЦЕНТРУ, опущен вниз */
         .header-logo {
             position: absolute;
             left: 50%;
-            top: 50%;
-            /* translate(-50%, -50%) центрирует, scale(4) увеличивает, +3px опускает вниз */
-            transform: translate(-50%, calc(-50% + 3px)) scale(4);
+            /* Было 50%, стало 53% чтобы опустить визуально ниже центра */
+            top: 53%; 
+            
+            /* Центрируем по горизонтали (-50%) и масштабируем (4) */
+            transform: translate(-50%, -50%) scale(4);
             
             margin: 0; 
             right: auto;
@@ -122,33 +124,4 @@
     <div id="app-interface">
         <!-- Шапка -->
         <header class="header">
-            <img src="ballonygz.png" alt="Logo" class="header-logo">
-        </header>
-
-        <!-- Основное содержимое -->
-        <main class="content">
-            <!-- Контент приложения -->
-        </main>
-    </div>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const loader = document.getElementById('loader-screen');
-            const appInterface = document.getElementById('app-interface');
-
-            function finishLoading() {
-                if (loader.style.display === 'none') return;
-
-                loader.classList.add('hidden');
-                appInterface.style.display = 'block';
-
-                setTimeout(() => {
-                    loader.style.display = 'none';
-                }, 500);
-            }
-
-            const loadTimer = setTimeout(finishLoading, 3000);
-        });
-    </script>
-</body>
-</html
+            <img src
