@@ -56,47 +56,52 @@
         .header {
             height: 100px;
             width: 100%;
-            /* Градиент: Фиолетовый -> Очень светло-фиолетовый (почти белый) -> Фиолетовый */
-            background: linear-gradient(45deg, #8A2BE2, #F3E5F5, #8A2BE2);
-            background-size: 200% 200%;
-            animation: gradientShift 4s ease infinite;
+            position: relative;
+            overflow: hidden;
+            
+            /* Сложный градиент: Фиолетовый -> Светло-сиреневый -> Белый/Очень светлый -> Фиолетовый */
+            background: linear-gradient(120deg, #8A2BE2, #E6E6FA, #F8F8FF, #9370DB, #8A2BE2);
+            background-size: 300% 300%;
+            /* Медленная анимация (8 секунд) */
+            animation: complexGradientFlow 8s ease infinite;
             
             display: flex;
             justify-content: center;
             align-items: center;
-            position: relative;
-            overflow: hidden; /* Чтобы шум не вылезал */
         }
 
-        /* Слой шума */
-        .header::before {
+        /* Анимация градиента: двигается по диагонали и меняет акценты */
+        @keyframes complexGradientFlow {
+            0% { background-position: 0% 50%; }
+            25% { background-position: 50% 100%; }
+            50% { background-position: 100% 50%; }
+            75% { background-position: 50% 0%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Слой зернистости (шума) */
+        .header::after {
             content: "";
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            opacity: 0.08; /* Прозрачность шума */
+            opacity: 0.07; /* Очень легкая зернистость */
             pointer-events: none;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-        }
-
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            z-index: 1;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
         .header-logo {
-            /* Базовые размеры можно оставить небольшими, так как мы увеличиваем через transform */
-            max-height: 50px; 
-            max-width: 50px;
+            /* Базовый размер небольшой, чтобы при увеличении не было пикселизации сразу */
+            max-height: 40px; 
+            max-width: 40px;
             object-fit: contain;
             
-            /* Увеличение в 4 раза и смещение вниз на 18px */
-            transform: scale(4) translateY(18px);
+            /* Увеличение в 4 раза и подъем ВВЕРХ на 15px */
+            transform: scale(4) translateY(-15px);
             
-            /* Важно: сохраняем позицию по центру после трансформации */
             position: relative;
             z-index: 2; /* Поверх шума */
         }
@@ -141,8 +146,3 @@
                 }, 500);
 
             }, 3000);
-        });
-    </script>
-</body>
-</html>
-
