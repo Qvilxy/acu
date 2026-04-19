@@ -1,1 +1,387 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Магазин Цветов и Подарков</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --primary-fuchsia: #FF00FF; /* Fuchsia - основной акцент */
+            --header-purple: #800080;
+            --header-yellow: #FFFF00;
+            --header-blue: #0000FF;
+            --header-white: #FFFFFF;
+            
+            --bg-color: #f5f5f5;
+            --text-color: #333;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --nav-bg: #ffffff;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden; /* Чтобы не скроллилось во время загрузки */
+        }
+
+        /* --- SPLASH SCREEN (ЭКРАН ЗАГРУЗКИ) --- */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff; /* Белый фон */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out, visibility 0.5s;
+        }
+
+        #splash-screen img {
+            width: 150px; /* Размер логотипа */
+            height: auto;
+            object-fit: contain;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* --- ОСНОВНОЙ ИНТЕРФЕЙС --- */
+        #app-interface {
+            display: none; /* Скрыто до конца загрузки */
+            height: 100vh;
+            flex-direction: column;
+            /* Отступ сверху 10px от кнопки закрытия (стандарт Telegram WebApp) */
+            padding-top: 10px; 
+            box-sizing: border-box;
+        }
+
+        /* Хедер с 5 цветами */
+        header {
+            height: 60px;
+            display: flex;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .header-segment {
+            flex: 1; /* По 20% каждый */
+        }
+        .seg-purple { background-color: var(--header-purple); }
+        .seg-yellow { background-color: var(--header-yellow); }
+        .seg-blue { background-color: var(--header-blue); }
+        .seg-white { background-color: var(--header-white); }
+        .seg-fuchsia { background-color: var(--primary-fuchsia); }
+
+        /* Контентная область */
+        main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 15px 80px 15px; /* Отступ снизу для навигации */
+            position: relative;
+            /* Смещение интерфейса вниз на 100px, как вы просили ранее */
+            transform: translateY(0); 
+        }
+
+        /* Поиск */
+        .search-container {
+            margin-bottom: 15px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+            background: rgba(255, 255, 255, 0.8);
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        /* Сетка товаров */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-img-placeholder {
+            width: 100%;
+            height: 120px;
+            background-color: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 12px;
+        }
+        
+        /* Если нет фото - прозрачный/серый тайл */
+        .product-img-placeholder.empty {
+            background-color: transparent;
+            border: 1px dashed #ccc;
+        }
+
+        .product-info {
+            padding: 8px;
+        }
+
+        .product-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .product-price {
+            color: var(--primary-fuchsia);
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .product-city {
+            font-size: 11px;
+            color: #777;
+            margin-top: 4px;
+        }
+
+        /* Нижняя навигация */
+        nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: var(--nav-bg);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid #eee;
+            z-index: 100;
+        }
+
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+            color: #555;
+            cursor: pointer;
+            /* Убираем выделение текста при клике на серый тайл/меню */
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        .nav-item.active {
+            color: var(--primary-fuchsia);
+            font-weight: bold;
+        }
+
+        /* Кнопка создания объявления (Оранжевая, без тени) */
+        .create-btn-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .create-btn {
+            background-color: orange;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: none !important; /* Удалена тень */
+        }
+
+        /* Табы контента */
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Экран загрузки -->
+    <div id="splash-screen">
+        <!-- Убедитесь, что файл ballonrose.png лежит в той же папке -->
+        <img src="ballonrose.png" alt="Loading...">
+    </div>
+
+    <!-- Основной интерфейс -->
+    <div id="app-interface">
+        
+        <!-- Хедер: 5 цветов по 20% -->
+        <header>
+            <div class="header-segment seg-purple"></div>
+            <div class="header-segment seg-yellow"></div>
+            <div class="header-segment seg-blue"></div>
+            <div class="header-segment seg-white"></div>
+            <div class="header-segment seg-fuchsia"></div>
+        </header>
+
+        <main>
+            <!-- Tab: Главная -->
+            <div id="tab-home" class="tab-content active">
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Поиск объявлений..." id="searchInput">
+                </div>
+
+                <h3 style="margin-left: 5px;">Цветы и Подарки</h3>
+                <div class="products-grid" id="productsList">
+                    <!-- Пример карточек -->
+                    <div class="product-card">
+                        <div class="product-img-placeholder">Фото</div>
+                        <div class="product-info">
+                            <div class="product-title">Букет Пионов</div>
+                            <div class="product-price">2500 ₽</div>
+                            <div class="product-city">Москва</div>
+                        </div>
+                    </div>
+                    <div class="product-card">
+                        <div class="product-img-placeholder empty">Нет фото</div>
+                        <div class="product-info">
+                            <div class="product-title">Торт Наполеон</div>
+                            <div class="product-price">1200 ₽</div>
+                            <div class="product-city">СПб</div>
+                        </div>
+                    </div>
+                     <div class="product-card">
+                        <div class="product-img-placeholder">Фото</div>
+                        <div class="product-info">
+                            <div class="product-title">Подарочный набор</div>
+                            <div class="product-price">3000 ₽</div>
+                            <div class="product-city">Казань</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Сообщения -->
+            <div id="tab-messages" class="tab-content">
+                <div style="padding: 20px; text-align: center; color: #777;">
+                    Здесь будут ваши сообщения
+                </div>
+            </div>
+
+            <!-- Tab: Профиль -->
+            <div id="tab-profile" class="tab-content">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="width: 80px; height: 80px; background: #ddd; border-radius: 50%; margin: 0 auto 10px;"></div>
+                    <h2 id="userName">Рад</h2>
+                </div>
+
+                <!-- Рейтинг -->
+                <div style="margin-bottom: 10px;">
+                    <span style="color: blue; font-size: 14px; margin-right: 3px; cursor: pointer;" onclick="openRating()">рейтинг</span>
+                    <span style="font-size: 18px;">♦ ♦ ♦ ♦ ♦</span> <!-- Ромбики без отступов -->
+                </div>
+
+                <!-- Активные объявления -->
+                <h4 style="margin: 10px 0;">Активные объявления</h4>
+                
+                <!-- Кнопка создать объявление -->
+                <div class="create-btn-container">
+                    <button class="create-btn">Создать объявление</button>
+                </div>
+            </div>
+        </main>
+
+        <nav>
+            <div class="nav-item active" onclick="switchTab('home', this)">Главная</div>
+            <div class="nav-item" onclick="switchTab('messages', this)">Сообщения</div>
+            <div class="nav-item" onclick="switchTab('profile', this)">Профиль</div>
+        </nav>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Раскрыть на весь экран
+
+        // Логика загрузки
+        window.onload = function() {
+            // Имитация времени показа заставки (например, 2000 мс)
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                const app = document.getElementById('app-interface');
+                
+                splash.classList.add('hidden');
+                
+                // Ждем окончания анимации исчезновения (0.5s), затем удаляем из потока и показываем приложение
+                setTimeout(() => {
+                    splash.style.display = 'none';
+                    app.style.display = 'flex';
+                    document.body.style.overflow = 'auto'; // Разрешить скролл
+                }, 500);
+            }, 2000);
+        };
+
+        // Переключение табов
+        function switchTab(tabName, element) {
+            // Скрыть все табы
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            // Показать нужный
+            document.getElementById('tab-' + tabName).classList.add('active');
+            
+            // Обновить навигацию
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        // Заглушка для рейтинга
+        function openRating() {
+            console.log("Открыть окно отзывов");
+            // Здесь логика открытия модального окна
+        }
+
+        // Поиск (простая фильтрация)
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const val = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.product-card');
+            
+            cards.forEach(card => {
+                const title = card.querySelector('.product-title').textContent.toLowerCase();
+                if(title.includes(val)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
 
