@@ -88,16 +88,16 @@
             background-image: url('image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyBAMAAADsEZWCAAAAGFBMVEUAAAA5OTkAAABMTExERERmZmYzMzMyMjJ4Oy/6AAAACHRSTlMAMwA3M2Y3ZpkN1u8AAAAJcEhZcwAADsQAAA7EAZUrDhsAAABBSURBVDjL7dExAQAgDMCw/396C2Ww0CqT5Jx0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHR0dHT0EL8A1wX/AK11j68AAAAASUVORK5CYII=');
         }
 
-        /* Логотип — ПО ЦЕНТРУ */
+        /* Логотип — ПО ЦЕНТРУ, опущен на 3px */
         .header-logo {
             position: absolute;
-            left: 50%; /* Сдвигаем начало элемента на 50% ширины родителя */
-            top: 50%;  /* Сдвигаем верх элемента на 50% высоты родителя */
-            transform: translate(-50%, -50%) scale(4); /* Центрируем сам элемент и увеличиваем */
+            left: 50%;
+            top: 50%;
+            /* translate(-50%, -50%) центрирует, scale(4) увеличивает, +3px опускает вниз */
+            transform: translate(-50%, calc(-50% + 3px)) scale(4);
             
-            /* Убрали лишние отступы и смещения */
             margin: 0; 
-            right: auto; /* Сброс предыдущего позиционирования справа */
+            right: auto;
             
             max-height: 40px;
             max-width: 40px;
@@ -151,5 +151,4 @@
         });
     </script>
 </body>
-</html>
-
+</html
