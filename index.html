@@ -1,1236 +1,653 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="theme-color" content="#007AFF" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>MixTrends • Апсайклинг одежды</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
-    /* ===== iOS SYSTEM VARIABLES ===== */
-    :root {
-      --ios-bg: #F2F2F7;
-      --ios-card: #FFFFFF;
-      --ios-text: #1C1C1E;
-      --ios-text-secondary: #8E8E93;
-      --ios-border: #C6C6C8;
-      --ios-blue: #007AFF;
-      --ios-blue-dark: #0051B5;
-      --ios-green: #34C759;
-      --ios-red: #FF3B30;
-      --ios-orange: #FF9500;
-      --ios-purple: #AF52DE;
-      --ios-blur: rgba(255, 255, 255, 0.85);
-      --ios-blur-dark: rgba(28, 28, 30, 0.85);
-      --ios-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      --ios-shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.12);
-      --ios-radius-sm: 10px;
-      --ios-radius: 16px;
-      --ios-radius-lg: 24px;
-      --ios-radius-xl: 32px;
-      --ios-safe-top: env(safe-area-inset-top);
-      --ios-safe-bottom: env(safe-area-inset-bottom);
-      --ios-safe-left: env(safe-area-inset-left);
-      --ios-safe-right: env(safe-area-inset-right);
-      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    }
-
-    /* ===== DARK MODE ===== */
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --ios-bg: #000000;
-        --ios-card: #1C1C1E;
-        --ios-text: #FFFFFF;
-        --ios-text-secondary: #AEAEB2;
-        --ios-border: #38383A;
-        --ios-blur: rgba(28, 28, 30, 0.85);
-        --ios-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        --ios-shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.4);
-      }
-    }
-
-    /* ===== BASE RESET ===== */
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-
-    html {
-      scroll-behavior: smooth;
-      -webkit-text-size-adjust: 100%;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
-      background: var(--ios-bg);
-      color: var(--ios-text);
-      line-height: 1.5;
-      overflow-x: hidden;
-      padding-top: var(--ios-safe-top);
-      padding-bottom: calc(80px + var(--ios-safe-bottom));
-      transition: var(--transition);
-    }
-
-    /* ===== UTILITIES ===== */
-    .container {
-      width: 100%;
-      max-width: 500px;
-      margin: 0 auto;
-      padding: 0 20px;
-    }
-
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
-
-    /* ===== TYPOGRAPHY ===== */
-    h1, h2, h3, h4 {
-      font-weight: 700;
-      line-height: 1.2;
-      letter-spacing: -0.02em;
-    }
-
-    h1 {
-      font-size: 34px;
-      margin-bottom: 12px;
-    }
-
-    h2 {
-      font-size: 28px;
-      margin: 32px 0 16px;
-    }
-
-    h3 {
-      font-size: 22px;
-      margin: 24px 0 12px;
-    }
-
-    h4 {
-      font-size: 19px;
-      margin: 20px 0 10px;
-    }
-
-    p {
-      font-size: 17px;
-      color: var(--ios-text-secondary);
-      margin-bottom: 16px;
-    }
-
-    .subtitle {
-      font-size: 19px;
-      font-weight: 600;
-      color: var(--ios-text);
-      margin-bottom: 8px;
-    }
-
-    .caption {
-      font-size: 13px;
-      color: var(--ios-text-secondary);
-      line-height: 1.4;
-    }
-
-    .price {
-      font-size: 32px;
-      font-weight: 700;
-      color: var(--ios-blue);
-      margin: 8px 0;
-    }
-
-    .price-old {
-      text-decoration: line-through;
-      color: var(--ios-text-secondary);
-      font-size: 20px;
-      margin-right: 8px;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 6px 12px;
-      background: linear-gradient(135deg, var(--ios-blue), var(--ios-purple));
-      color: white;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 600;
-      margin: 8px 0;
-    }
-
-    /* ===== BUTTONS ===== */
-    .btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 100%;
-      padding: 16px 20px;
-      background: var(--ios-blue);
-      color: white;
-      border: none;
-      border-radius: var(--ios-radius-lg);
-      font-size: 17px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: var(--transition);
-      box-shadow: var(--ios-shadow);
-      -webkit-appearance: none;
-      appearance: none;
-    }
-
-    .btn:active {
-      transform: scale(0.98);
-      background: var(--ios-blue-dark);
-    }
-
-    .btn-outline {
-      background: transparent;
-      border: 2px solid var(--ios-blue);
-      color: var(--ios-blue);
-    }
-
-    .btn-outline:active {
-      background: rgba(0, 122, 255, 0.1);
-    }
-
-    .btn-large {
-      padding: 18px 24px;
-      font-size: 18px;
-      border-radius: var(--ios-radius-xl);
-    }
-
-    .btn-gradient {
-      background: linear-gradient(135deg, var(--ios-blue), var(--ios-purple));
-      box-shadow: 0 4px 24px rgba(175, 82, 222, 0.4);
-    }
-
-    .btn-gradient:active {
-      background: linear-gradient(135deg, var(--ios-blue-dark), #8B47C9);
-    }
-
-    /* ===== CARDS ===== */
-    .card {
-      background: var(--ios-card);
-      border-radius: var(--ios-radius);
-      padding: 20px;
-      margin-bottom: 16px;
-      box-shadow: var(--ios-shadow);
-      transition: var(--transition);
-    }
-
-    .card:active {
-      transform: scale(0.995);
-    }
-
-    .card-hero {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border-radius: var(--ios-radius-lg);
-      padding: 28px 24px;
-      margin: 16px 0 24px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .card-hero::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      right: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
-      animation: shimmer 8s infinite linear;
-    }
-
-    @keyframes shimmer {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .card-hero h1 {
-      color: white;
-      margin-bottom: 8px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .card-hero p {
-      color: rgba(255, 255, 255, 0.9);
-      font-size: 16px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .card-compact {
-      padding: 16px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .card-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, var(--ios-blue), var(--ios-purple));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 20px;
-      flex-shrink: 0;
-    }
-
-    /* ===== SECTIONS ===== */
-    section {
-      padding: 20px 0;
-    }
-
-    .section-header {
-      padding: 0 20px;
-      margin-bottom: 12px;
-    }
-
-    .section-header h2 {
-      margin: 0;
-    }
-
-    /* ===== STEPS ===== */
-    .steps {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .step {
-      display: flex;
-      gap: 16px;
-      padding: 16px;
-      background: var(--ios-card);
-      border-radius: var(--ios-radius);
-      box-shadow: var(--ios-shadow);
-      position: relative;
-    }
-
-    .step::before {
-      content: '';
-      position: absolute;
-      left: 22px;
-      top: 56px;
-      bottom: -12px;
-      width: 2px;
-      background: var(--ios-border);
-    }
-
-    .step:last-child::before {
-      display: none;
-    }
-
-    .step-number {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: var(--ios-blue);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 16px;
-      flex-shrink: 0;
-      z-index: 1;
-    }
-
-    .step-content h4 {
-      margin: 0 0 4px;
-      font-size: 17px;
-    }
-
-    .step-content p {
-      margin: 0;
-      font-size: 15px;
-    }
-
-    /* ===== FAQ ===== */
-    .faq-item {
-      background: var(--ios-card);
-      border-radius: var(--ios-radius);
-      margin-bottom: 10px;
-      overflow: hidden;
-      box-shadow: var(--ios-shadow);
-    }
-
-    .faq-question {
-      padding: 18px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 17px;
-      transition: var(--transition);
-    }
-
-    .faq-question:active {
-      background: rgba(0, 122, 255, 0.08);
-    }
-
-    .faq-question::after {
-      content: '▸';
-      font-size: 20px;
-      transition: transform 0.3s ease;
-      color: var(--ios-text-secondary);
-    }
-
-    .faq-item.active .faq-question::after {
-      transform: rotate(90deg);
-    }
-
-    .faq-answer {
-      max-height: 0;
-      overflow: hidden;
-      padding: 0 20px;
-      transition: max-height 0.3s ease, padding 0.3s ease;
-    }
-
-    .faq-item.active .faq-answer {
-      max-height: 500px;
-      padding: 0 20px 18px;
-    }
-
-    .faq-answer p {
-      margin: 0;
-      font-size: 15px;
-    }
-
-    /* ===== OFFER BANNER ===== */
-    .offer-banner {
-      background: linear-gradient(135deg, #11998e, #38ef7d);
-      border-radius: var(--ios-radius-lg);
-      padding: 24px;
-      margin: 24px 0;
-      color: white;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .offer-banner::before {
-      content: '🎁';
-      position: absolute;
-      top: -20px;
-      right: -10px;
-      font-size: 80px;
-      opacity: 0.15;
-      transform: rotate(15deg);
-    }
-
-    .offer-banner h3 {
-      color: white;
-      margin-bottom: 8px;
-    }
-
-    .offer-banner .price {
-      color: white;
-      margin: 12px 0;
-    }
-
-    .offer-banner p {
-      color: rgba(255, 255, 255, 0.95);
-      font-size: 15px;
-      margin-bottom: 16px;
-    }
-
-    .offer-list {
-      list-style: none;
-      margin: 16px 0;
-    }
-
-    .offer-list li {
-      padding-left: 24px;
-      position: relative;
-      margin-bottom: 8px;
-      font-size: 15px;
-    }
-
-    .offer-list li::before {
-      content: '✓';
-      position: absolute;
-      left: 0;
-      color: white;
-      font-weight: bold;
-    }
-
-    /* ===== HEADER ===== */
-    .header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: var(--ios-blur);
-      backdrop-filter: saturate(180%) blur(20px);
-      -webkit-backdrop-filter: saturate(180%) blur(20px);
-      border-bottom: 1px solid var(--ios-border);
-      padding: 12px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .logo {
-      font-size: 22px;
-      font-weight: 700;
-      background: linear-gradient(135deg, var(--ios-blue), var(--ios-purple));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 12px;
-    }
-
-    .icon-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: var(--ios-card);
-      border: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      cursor: pointer;
-      box-shadow: var(--ios-shadow);
-      transition: var(--transition);
-    }
-
-    .icon-btn:active {
-      transform: scale(0.95);
-      background: var(--ios-blue);
-      color: white;
-    }
-
-    /* ===== BOTTOM NAV ===== */
-    .tab-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      z-index: 200;
-      background: var(--ios-blur);
-      backdrop-filter: saturate(180%) blur(20px);
-      -webkit-backdrop-filter: saturate(180%) blur(20px);
-      border-top: 1px solid var(--ios-border);
-      padding: 8px 20px calc(12px + var(--ios-safe-bottom));
-      display: flex;
-      justify-content: space-around;
-      padding-bottom: calc(12px + var(--ios-safe-bottom));
-    }
-
-    .tab-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      padding: 8px 12px;
-      border-radius: 12px;
-      color: var(--ios-text-secondary);
-      text-decoration: none;
-      font-size: 11px;
-      font-weight: 500;
-      transition: var(--transition);
-      flex: 1;
-      max-width: 100px;
-    }
-
-    .tab-item.active {
-      color: var(--ios-blue);
-      background: rgba(0, 122, 255, 0.1);
-    }
-
-    .tab-icon {
-      font-size: 22px;
-      margin-bottom: 2px;
-    }
-
-    .tab-item.active .tab-icon {
-      transform: scale(1.1);
-    }
-
-    /* ===== ANIMATIONS ===== */
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .animate {
-      animation: fadeInUp 0.5s ease forwards;
-    }
-
-    .delay-1 { animation-delay: 0.1s; }
-    .delay-2 { animation-delay: 0.2s; }
-    .delay-3 { animation-delay: 0.3s; }
-    .delay-4 { animation-delay: 0.4s; }
-
-    /* ===== SCROLL INDICATOR ===== */
-    .scroll-indicator {
-      position: fixed;
-      top: calc(var(--ios-safe-top) + 60px);
-      right: 12px;
-      width: 4px;
-      height: 40px;
-      background: var(--ios-border);
-      border-radius: 2px;
-      overflow: hidden;
-      z-index: 90;
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-
-    .scroll-indicator.visible {
-      opacity: 1;
-    }
-
-    .scroll-indicator-fill {
-      width: 100%;
-      height: 0%;
-      background: var(--ios-blue);
-      border-radius: 2px;
-      transition: height 0.1s;
-    }
-
-    /* ===== FLOATING BUTTON ===== */
-    .fab {
-      position: fixed;
-      bottom: calc(90px + var(--ios-safe-bottom));
-      right: 20px;
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--ios-blue), var(--ios-purple));
-      color: white;
-      border: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      box-shadow: var(--ios-shadow-lg);
-      cursor: pointer;
-      z-index: 150;
-      transition: var(--transition);
-      animation: pulse 2s infinite;
-    }
-
-    .fab:active {
-      transform: scale(0.92);
-      animation: none;
-    }
-
-    @keyframes pulse {
-      0%, 100% { box-shadow: 0 4px 24px rgba(175, 82, 222, 0.4); }
-      50% { box-shadow: 0 8px 40px rgba(175, 82, 222, 0.7); }
-    }
-
-    /* ===== ACCESSIBILITY ===== */
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-      }
-    }
-
-    /* ===== UTILITIES FOR CONTENT ===== */
-    .features-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-      margin: 16px 0;
-    }
-
-    .feature-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      padding: 14px;
-      background: var(--ios-card);
-      border-radius: var(--ios-radius);
-      box-shadow: var(--ios-shadow);
-    }
-
-    .feature-icon {
-      font-size: 24px;
-      flex-shrink: 0;
-    }
-
-    .eco-badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 16px 0;
-    }
-
-    .eco-badge {
-      padding: 8px 14px;
-      background: var(--ios-card);
-      border-radius: 20px;
-      font-size: 14px;
-      font-weight: 500;
-      box-shadow: var(--ios-shadow);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    /* ===== MODAL ===== */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.4);
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      z-index: 300;
-      opacity: 0;
-      visibility: hidden;
-      transition: var(--transition);
-      padding-bottom: var(--ios-safe-bottom);
-    }
-
-    .modal-overlay.active {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .modal {
-      width: 100%;
-      max-width: 500px;
-      background: var(--ios-card);
-      border-radius: var(--ios-radius-lg) var(--ios-radius-lg) 0 0;
-      padding: 24px 20px 32px;
-      transform: translateY(100%);
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-
-    .modal-overlay.active .modal {
-      transform: translateY(0);
-    }
-
-    .modal-handle {
-      width: 40px;
-      height: 5px;
-      background: var(--ios-border);
-      border-radius: 3px;
-      margin: 0 auto 20px;
-    }
-
-    .modal-title {
-      font-size: 22px;
-      font-weight: 700;
-      margin-bottom: 16px;
-      text-align: center;
-    }
-
-    .form-group {
-      margin-bottom: 16px;
-    }
-
-    .form-label {
-      display: block;
-      font-size: 15px;
-      font-weight: 500;
-      margin-bottom: 8px;
-      color: var(--ios-text);
-    }
-
-    .form-input,
-    .form-textarea {
-      width: 100%;
-      padding: 14px 16px;
-      border: 1px solid var(--ios-border);
-      border-radius: var(--ios-radius);
-      font-size: 17px;
-      background: var(--ios-bg);
-      color: var(--ios-text);
-      transition: var(--transition);
-      -webkit-appearance: none;
-      appearance: none;
-    }
-
-    .form-input:focus,
-    .form-textarea:focus {
-      outline: none;
-      border-color: var(--ios-blue);
-      box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15);
-    }
-
-    .form-textarea {
-      min-height: 100px;
-      resize: vertical;
-    }
-
-    .modal-actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 24px;
-    }
-
-    .modal-actions .btn {
-      flex: 1;
-    }
-
-    /* ===== SUCCESS STATE ===== */
-    .success-state {
-      text-align: center;
-      padding: 40px 20px;
-    }
-
-    .success-icon {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--ios-green), #28B446);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 20px;
-      font-size: 40px;
-      color: white;
-      animation: bounce 0.6s ease;
-    }
-
-    @keyframes bounce {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-    }
-
-    /* ===== HIDE SCROLLBAR BUT KEEP FUNCTIONALITY ===== */
-    ::-webkit-scrollbar {
-      width: 0;
-      height: 0;
-    }
-
-    /* ===== RESPONSIVE ADJUSTMENTS ===== */
-    @media (min-width: 501px) {
-      body {
-        padding-bottom: calc(80px + var(--ios-safe-bottom));
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Job Finder TMA</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Иконки -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #0f0f0f;
+            --card-bg: #0f0f0f;
+            --text-main: #ffffff;
+            --text-secondary: #a0a0a0;
+            --accent-gradient: linear-gradient(90deg, #8A2BE2, #00BFFF);
+            --glow-shadow: 0 0 10px rgba(255, 255, 255, 0.15), inset 0 0 5px rgba(255, 255, 255, 0.05);
+            --nav-height: 70px;
+            --safe-area-bottom: env(safe-area-inset-bottom);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-bottom: calc(var(--nav-height) + var(--safe-area-bottom) + 20px);
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* --- Утилиты --- */
+        .hidden { display: none !important; }
+        .flex-center { display: flex; align-items: center; justify-content: center; }
+        .btn { border: none; outline: none; cursor: pointer; transition: 0.2s; }
+        
+        /* --- Навигация (Таблетка) --- */
+        .bottom-nav {
+            position: fixed;
+            bottom: calc(20px + var(--safe-area-bottom));
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            height: var(--nav-height);
+            background: rgba(30, 30, 30, 0.8);
+            backdrop-filter: blur(15px);
+            border-radius: 35px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .nav-item {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 10px;
+            gap: 4px;
+            cursor: pointer;
+        }
+
+        .nav-item.active { color: var(--text-main); }
+        .nav-item i { font-size: 20px; margin-bottom: 2px; }
+
+        /* --- Карточки (Таблетки) --- */
+        .pill-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 16px;
+            margin: 12px 16px;
+            box-shadow: var(--glow-shadow);
+            position: relative;
+            transition: transform 0.1s;
+        }
+        .pill-card:active { transform: scale(0.98); }
+
+        /* --- Вкладка 1: Главная --- */
+        .job-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+        .job-title { font-weight: 600; font-size: 16px; max-width: 70%; }
+        .job-price { font-weight: 700; color: var(--text-main); white-space: nowrap; }
+        .job-date { font-size: 12px; color: var(--text-secondary); }
+
+        /* --- Модальные окна --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 2000;
+            display: flex; align-items: flex-end; justify-content: center;
+            opacity: 0; pointer-events: none; transition: 0.3s;
+        }
+        .modal-overlay.open { opacity: 1; pointer-events: all; }
+        
+        .modal-content {
+            background: #1a1a1a;
+            width: 100%;
+            border-radius: 24px 24px 0 0;
+            padding: 24px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(100%);
+            transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .modal-overlay.open .modal-content { transform: translateY(0); }
+
+        /* --- Элементы форм --- */
+        .input-group { margin-bottom: 16px; }
+        .input-group label { display: block; color: var(--text-secondary); margin-bottom: 6px; font-size: 13px; }
+        .form-input {
+            width: 100%; background: #252525; border: 1px solid #333;
+            color: white; padding: 12px; border-radius: 12px; font-size: 15px; outline: none;
+        }
+        .form-input:focus { border-color: #8A2BE2; }
+        
+        .gradient-btn {
+            width: 100%; padding: 16px; border-radius: 16px;
+            background: var(--accent-gradient); color: white;
+            font-weight: 700; font-size: 16px; margin-top: 10px;
+        }
+
+        /* --- Профиль и Звезды --- */
+        .profile-header { text-align: center; padding: 30px 0; }
+        .avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.1); }
+        .stars-container { display: flex; gap: 4px; justify-content: center; margin: 8px 0; }
+        .star { color: #444; font-size: 18px; cursor: pointer; }
+        .star.filled { color: #FFD700; }
+        
+        /* --- Капча --- */
+        .captcha-widget { text-align: center; padding: 20px; }
+        .captcha-question { font-size: 24px; margin: 20px 0; font-weight: bold; letter-spacing: 2px; }
+
+        /* --- Счетчик символов --- */
+        .char-counter { text-align: right; font-size: 12px; margin-top: 4px; color: #555; transition: color 0.3s; }
+        .char-counter.valid { color: #4CAF50; }
+        .char-counter.invalid { color: #F44336; }
+
+        /* --- Кнопки управления объявлением --- */
+        .manage-btn {
+            position: absolute; top: 12px; right: 12px;
+            width: 32px; height: 32px; border-radius: 50%;
+            background: #252525; display: flex; align-items: center; justify-content: center;
+            z-index: 10;
+        }
+        .manage-menu {
+            position: absolute; top: 48px; right: 16px;
+            background: #252525; border-radius: 12px; padding: 8px;
+            display: flex; gap: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            z-index: 11;
+        }
+        .action-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .action-edit { background: rgba(255,255,255,0.1); color: white; }
+        .action-delete { background: rgba(244,67,54,0.2); color: #F44336; }
+
+        /* --- Отзыв --- */
+        .review-pill { display: flex; gap: 12px; align-items: flex-start; }
+        .review-content { flex: 1; }
+        .review-text { font-size: 14px; line-height: 1.4; margin-top: 6px; color: #ddd; }
+
+        /* --- Детали задания --- */
+        .job-detail-price { font-size: 24px; font-weight: 700; margin: 10px 0; }
+        .job-detail-desc { color: #ccc; line-height: 1.5; margin-bottom: 20px; white-space: pre-wrap; }
+        .user-pill {
+            display: flex; align-items: center; justify-content: space-between;
+            background: #1f1f1f; padding: 10px; border-radius: 16px; margin-top: 20px;
+            box-shadow: var(--glow-shadow);
+        }
+        .user-info { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .user-info .avatar { width: 40px; height: 40px; }
+        .contact-btn {
+            background: var(--accent-gradient); padding: 8px 16px;
+            border-radius: 12px; font-size: 13px; font-weight: 600; color: white;
+        }
+
+    </style>
 </head>
 <body>
-  <!-- ===== HEADER ===== -->
-  <header class="header">
-    <div class="logo">MixTrends</div>
-    <div class="header-actions">
-      <button class="icon-btn" aria-label="Поиск">🔍</button>
-      <button class="icon-btn" aria-label="Профиль">👤</button>
+
+    <!-- === ВКЛАДКА 1: ГЛАВНАЯ === -->
+    <div id="tab-home" class="tab-content">
+        <h2 style="padding: 20px 16px 0;">Задания</h2>
+        <div id="jobs-list"></div>
     </div>
-  </header>
 
-  <!-- ===== MAIN CONTENT ===== -->
-  <main class="container">
-    
-    <!-- HERO SECTION -->
-    <section class="animate">
-      <div class="card-hero">
-        <h1>Перешиваем любимые наряды,<br>дарим им вторую жизнь ✨</h1>
-        <p>Сохраните бюджет и планету — апсайклинг с профессиональным стилистом</p>
-        <button class="btn btn-large btn-gradient" onclick="openModal()" style="margin-top: 20px;">
-          📝 Начать преображение
-        </button>
-      </div>
-    </section>
-
-    <!-- VALUE PROPS -->
-    <section class="animate delay-1">
-      <div class="section-header">
-        <h2>Почему мы?</h2>
-      </div>
-      <div class="features-grid">
-        <div class="feature-item">
-          <span class="feature-icon">♻️</span>
-          <div>
-            <div class="subtitle">Экологично</div>
-            <p class="caption">Сберегаем планету, перерабатывая ваши любимые вещи</p>
-          </div>
+    <!-- === ВКЛАДКА 2: СОЗДАТЬ ЗАДАНИЕ === -->
+    <div id="tab-create" class="tab-content hidden">
+        <h2 style="padding: 20px 16px;">Новое задание</h2>
+        <div style="padding: 0 16px;">
+            <div class="input-group">
+                <label>Название</label>
+                <input type="text" id="create-title" class="form-input" placeholder="Например: Выгулять собаку">
+            </div>
+            <div class="input-group">
+                <label>Описание</label>
+                <textarea id="create-desc" class="form-input" rows="4" placeholder="Подробности..."></textarea>
+            </div>
+            <div class="input-group">
+                <label>Цена (₽)</label>
+                <input type="number" id="create-price" class="form-input" placeholder="1000">
+            </div>
+            <div class="input-group">
+                <label>Дата и время</label>
+                <input type="datetime-local" id="create-date" class="form-input">
+            </div>
+            <!-- Отступ для кнопки над меню -->
+            <div style="height: 80px;"></div>
         </div>
-        <div class="feature-item">
-          <span class="feature-icon">✨</span>
-          <div>
-            <div class="subtitle">Уникально</div>
-            <p class="caption">Каждая вещь становится единственным экземпляром ручной работы</p>
-          </div>
+        <div style="position: fixed; bottom: calc(var(--nav-height) + var(--safe-area-bottom) + 20px); left: 0; width: 100%; padding: 0 16px; z-index: 900;">
+            <button class="gradient-btn" onclick="app.createJob()">Создать объявление</button>
         </div>
-        <div class="feature-item">
-          <span class="feature-icon">💰</span>
-          <div>
-            <div class="subtitle">Выгодно</div>
-            <p class="caption">Экономия до 50% по сравнению с покупкой нового</p>
-          </div>
-        </div>
-      </div>
-      <div class="eco-badges">
-        <span class="eco-badge">🌱 Zero Waste</span>
-        <span class="eco-badge">✂️ Ручная работа</span>
-        <span class="eco-badge">👗 Индивидуальный подход</span>
-      </div>
-    </section>
-
-    <!-- PROCESS STEPS -->
-    <section class="animate delay-2">
-      <div class="section-header">
-        <h2>Как это работает</h2>
-      </div>
-      <div class="steps">
-        <div class="step">
-          <div class="step-number">1</div>
-          <div class="step-content">
-            <h4>Заполните анкету</h4>
-            <p>Пришлите фото гардероба и расскажите о предпочтениях в стиле</p>
-          </div>
-        </div>
-        <div class="step">
-          <div class="step-number">2</div>
-          <div class="step-content">
-            <h4>Онлайн-консультация</h4>
-            <p>Получите персональные рекомендации от профессионального стилиста</p>
-          </div>
-        </div>
-        <div class="step">
-          <div class="step-number">3</div>
-          <div class="step-content">
-            <h4>Бесплатный забор</h4>
-            <p>Наш курьер приедет и заберёт вещи для апсайклинга</p>
-          </div>
-        </div>
-        <div class="step">
-          <div class="step-number">4</div>
-          <div class="step-content">
-            <h4>Готово! ✨</h4>
-            <p>Получите обновлённые вещи, наполненные новым смыслом</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SPECIAL OFFER -->
-    <section class="animate delay-3">
-      <div class="offer-banner">
-        <span class="badge">🔥 Горячее предложение</span>
-        <h3>Апсайклинг от 3+ вещей</h3>
-        <div class="price"><span class="price-old">30 000₽</span>от 25 000₽*</div>
-        <ul class="offer-list">
-          <li>Перешив и стилизация каждой вещи</li>
-          <li>Уникальный дизайн в единственном экземпляре</li>
-          <li><strong>В подарок:</strong> разбор гардероба онлайн</li>
-          <li><strong>При 7+ вещах:</strong> фотосессия в подарок 📸</li>
-        </ul>
-        <button class="btn btn-large" onclick="openModal()" style="background: white; color: #11998e;">
-          Забронировать со скидкой
-        </button>
-        <p class="caption" style="color: rgba(255,255,255,0.8); margin-top: 12px;">*Итоговая стоимость зависит от сложности работ</p>
-      </div>
-    </section>
-
-    <!-- FAQ -->
-    <section class="animate delay-4">
-      <div class="section-header">
-        <h2>Вопросы и ответы</h2>
-      </div>
-      
-      <div class="faq-item">
-        <div class="faq-question">Как происходит оценка гардероба?</div>
-        <div class="faq-answer">
-          <p>Отправьте краткую анкету с предпочтениями по стилю, размерами и фото гардероба. Это поможет нам создать идеальный образ с новыми впечатлениями.</p>
-        </div>
-      </div>
-      
-      <div class="faq-item">
-        <div class="faq-question">Что входит в стоимость?</div>
-        <div class="faq-answer">
-          <p>Онлайн-оценка, консультация стилиста, качественный перешив, бесплатный забор и возврат одежды курьером — всё для вашего комфорта.</p>
-        </div>
-      </div>
-      
-      <div class="faq-item">
-        <div class="faq-question">От чего зависит итоговая сумма?</div>
-        <div class="faq-answer">
-          <p>Стоимость определяется сложностью перешива и количеством вещей. Каждый элемент обрабатывается с вниманием и мастерством нашей швейной мастерской.</p>
-        </div>
-      </div>
-      
-      <div class="faq-item">
-        <div class="faq-question">За счёт чего экономия?</div>
-        <div class="faq-answer">
-          <p>Средняя стоимость стилиста — ~50 000₽. Мы оптимизируем бюджет благодаря удалённой работе и бережному отношению к вашему гардеробу: сохраняем и преображаем любимые вещи.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- CTA SECTION -->
-    <section style="padding-bottom: 40px;" class="animate">
-      <div class="card" style="text-align: center;">
-        <h3 style="margin-bottom: 8px;">Готовы к преображению?</h3>
-        <p style="margin-bottom: 20px;">Бесплатная консультация стилиста — уже сегодня</p>
-        <button class="btn btn-large btn-gradient" onclick="openModal()">
-          🚀 Начать сейчас
-        </button>
-        <p class="caption" style="margin-top: 16px;">
-          Нажимая кнопку, вы соглашаетесь с <a href="#" style="color: var(--ios-blue);">политикой конфиденциальности</a>
-        </p>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- ===== FLOATING ACTION BUTTON ===== -->
-  <button class="fab" onclick="openModal()" aria-label="Создать заявку">+</button>
-
-  <!-- ===== SCROLL INDICATOR ===== -->
-  <div class="scroll-indicator" id="scrollIndicator">
-    <div class="scroll-indicator-fill" id="scrollFill"></div>
-  </div>
-
-  <!-- ===== BOTTOM NAVIGATION ===== -->
-  <nav class="tab-bar">
-    <a href="#" class="tab-item active">
-      <span class="tab-icon">🏠</span>
-      <span>Главная</span>
-    </a>
-    <a href="#process" class="tab-item">
-      <span class="tab-icon">📋</span>
-      <span>Процесс</span>
-    </a>
-    <a href="#" class="tab-item" onclick="openModal(); return false;">
-      <span class="tab-icon" style="font-size: 26px;">✨</span>
-      <span>Заказать</span>
-    </a>
-    <a href="#faq" class="tab-item">
-      <span class="tab-icon">❓</span>
-      <span>FAQ</span>
-    </a>
-    <a href="#" class="tab-item">
-      <span class="tab-icon">👤</span>
-      <span>Профиль</span>
-    </a>
-  </nav>
-
-  <!-- ===== MODAL FORM ===== -->
-  <div class="modal-overlay" id="modalOverlay">
-    <div class="modal">
-      <div class="modal-handle"></div>
-      <h3 class="modal-title">Начать преображение</h3>
-      
-      <form id="consultationForm" onsubmit="submitForm(event)">
-        <div class="form-group">
-          <label class="form-label" for="name">Ваше имя</label>
-          <input type="text" id="name" class="form-input" placeholder="Введите имя" required />
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label" for="phone">Телефон</label>
-          <input type="tel" id="phone" class="form-input" placeholder="+7 (___) ___-__-__" required />
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label" for="items">Количество вещей</label>
-          <select id="items" class="form-input" required>
-            <option value="">Выберите</option>
-            <option value="3">3 вещи (от 25 000₽)</option>
-            <option value="5">5 вещей (от 35 000₽)</option>
-            <option value="7+">7+ вещей (от 45 000₽ + фотосессия)</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label" for="message">Пожелания по стилю</label>
-          <textarea id="message" class="form-textarea" placeholder="Расскажите, что хотите изменить..."></textarea>
-        </div>
-        
-        <div class="modal-actions">
-          <button type="button" class="btn btn-outline" onclick="closeModal()">Отмена</button>
-          <button type="submit" class="btn btn-gradient">Отправить заявку</button>
-        </div>
-      </form>
-      
-      <!-- Success State (hidden by default) -->
-      <div id="successState" class="success-state" style="display: none;">
-        <div class="success-icon">✓</div>
-        <h3 style="margin-bottom: 12px;">Заявка отправлена! 🎉</h3>
-        <p style="margin-bottom: 24px;">Наш стилист свяжется с вами в течение 2 часов</p>
-        <button class="btn btn-large" onclick="closeModal()">Понятно</button>
-      </div>
     </div>
-  </div>
 
-  <!-- ===== JAVASCRIPT ===== -->
-  <script>
-    // ===== FAQ ACCORDION =====
-    document.querySelectorAll('.faq-question').forEach(question => {
-      question.addEventListener('click', () => {
-        const item = question.parentElement;
-        const isActive = item.classList.contains('active');
-        
-        // Close all
-        document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
-        
-        // Toggle current
-        if (!isActive) {
-          item.classList.add('active');
-        }
-      });
-    });
+    <!-- === ВКЛАДКА 3: ПРОФИЛЬ === -->
+    <div id="tab-profile" class="tab-content hidden">
+        <div class="profile-header">
+            <img id="my-avatar" src="" class="avatar">
+            <h3 id="my-nick" style="margin-top: 10px;">Username</h3>
+            <div id="my-stars" class="stars-container"></div>
+            <p style="color: var(--text-secondary); font-size: 13px; margin-top: 4px;">Мои отзывы</p>
+        </div>
+        <h3 style="padding: 0 16px; margin-bottom: 10px;">Мои объявления</h3>
+        <div id="my-jobs-list"></div>
+    </div>
 
-    // ===== MODAL FUNCTIONS =====
-    function openModal() {
-      document.getElementById('modalOverlay').classList.add('active');
-      document.body.style.overflow = 'hidden';
-    }
+    <!-- === НИЖНЕЕ МЕНЮ === -->
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="app.switchTab('home')">
+            <i class="fa-solid fa-house"></i>
+            <span>Главная</span>
+        </div>
+        <div class="nav-item" onclick="app.switchTab('create')">
+            <i class="fa-solid fa-plus-circle"></i>
+            <span>Создать</span>
+        </div>
+        <div class="nav-item" onclick="app.switchTab('profile')">
+            <i class="fa-solid fa-user"></i>
+            <span>Профиль</span>
+        </div>
+    </nav>
 
-    function closeModal() {
-      document.getElementById('modalOverlay').classList.remove('active');
-      document.getElementById('successState').style.display = 'none';
-      document.getElementById('consultationForm').style.display = 'block';
-      document.body.style.overflow = '';
-    }
+    <!-- === МОДАЛКА: ДЕТАЛИ ЗАДАНИЯ === -->
+    <div id="modal-job-detail" class="modal-overlay" onclick="if(event.target===this) this.classList.remove('open')">
+        <div class="modal-content">
+            <h2 id="detail-title"></h2>
+            <div id="detail-price" class="job-detail-price"></div>
+            <p id="detail-desc" class="job-detail-desc"></p>
+            <p id="detail-date" style="color: var(--text-secondary); font-size: 13px;"></p>
+            
+            <div class="user-pill">
+                <div class="user-info" id="detail-user-click">
+                    <img id="detail-avatar" src="" class="avatar">
+                    <div>
+                        <div id="detail-username" style="font-weight: 600; font-size: 14px;"></div>
+                        <div id="detail-rating" style="font-size: 11px; color: #FFD700;"></div>
+                    </div>
+                </div>
+                <button class="contact-btn" id="detail-contact-btn">Написать</button>
+            </div>
+        </div>
+    </div>
 
-    // Close modal on overlay click
-    document.getElementById('modalOverlay').addEventListener('click', (e) => {
-      if (e.target.id === 'modalOverlay') {
-        closeModal();
-      }
-    });
+    <!-- === МОДАЛКА: ПРОФИЛЬ ДРУГОГО ПОЛЬЗОВАТЕЛЯ === -->
+    <div id="modal-user-profile" class="modal-overlay" onclick="if(event.target===this) this.classList.remove('open')">
+        <div class="modal-content">
+            <div class="profile-header">
+                <img id="profile-avatar" src="" class="avatar">
+                <h3 id="profile-nick" style="margin-top: 10px;"></h3>
+                <div id="profile-stars" class="stars-container"></div>
+                <button class="gradient-btn" style="margin-top: 15px; padding: 10px;" onclick="app.startReviewProcess()">Оставить отзыв</button>
+            </div>
+            <h3 style="margin-bottom: 10px;">Отзывы</h3>
+            <div id="profile-reviews-list"></div>
+        </div>
+    </div>
 
-    // ===== FORM SUBMISSION =====
-    function submitForm(e) {
-      e.preventDefault();
-      
-      // Simple validation
-      const phone = document.getElementById('phone').value;
-      if (!/^\+7\s?\(?\d{3}\)?\s?\d{3}-?\d{2}-?\d{2}$/.test(phone.replace(/\s/g, ''))) {
-        alert('Пожалуйста, введите корректный номер телефона');
-        return;
-      }
-      
-      // Show success state
-      document.getElementById('consultationForm').style.display = 'none';
-      document.getElementById('successState').style.display = 'block';
-      
-      // In production: send data to backend
-      console.log('Form submitted:', {
-        name: document.getElementById('name').value,
-        phone: phone,
-        items: document.getElementById('items').value,
-        message: document.getElementById('message').value
-      });
-    }
+    <!-- === МОДАЛКА: КАПЧА === -->
+    <div id="modal-captcha" class="modal-overlay">
+        <div class="modal-content captcha-widget">
+            <h3>Проверка</h3>
+            <p style="color: var(--text-secondary); margin-top: 5px;">Решите пример, чтобы оставить отзыв</p>
+            <div id="captcha-question" class="captcha-question"></div>
+            <input type="number" id="captcha-answer" class="form-input" style="text-align: center; font-size: 20px;">
+            <button class="gradient-btn" onclick="app.verifyCaptcha()">Проверить</button>
+        </div>
+    </div>
 
-    // ===== SCROLL INDICATOR =====
-    const scrollIndicator = document.getElementById('scrollIndicator');
-    const scrollFill = document.getElementById('scrollFill');
-    
-    window.addEventListener('scroll', () => {
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const scrollPercent = (scrollTop / docHeight) * 100;
-      
-      // Show indicator after scrolling 200px
-      if (scrollTop > 200) {
-        scrollIndicator.classList.add('visible');
-      } else {
-        scrollIndicator.classList.remove('visible');
-      }
-      
-      scrollFill.style.height = `${Math.min(scrollPercent, 100)}%`;
-    });
+    <!-- === МОДАЛКА: ФОРМА ОТЗЫВА === -->
+    <div id="modal-review-form" class="modal-overlay" onclick="if(event.target===this) this.classList.remove('open')">
+        <div class="modal-content">
+            <h3 style="text-align: center; margin-bottom: 15px;">Ваш отзыв</h3>
+            <div id="review-stars-input" class="stars-container" style="margin-bottom: 15px;"></div>
+            <textarea id="review-text" class="form-input" rows="4" placeholder="Напишите отзыв (15-100 символов)" oninput="app.updateCharCounter()"></textarea>
+            <div id="char-counter" class="char-counter">0/150</div>
+            <button class="gradient-btn" onclick="app.submitReview()">Отправить</button>
+        </div>
+    </div>
 
-    // ===== ANIMATE ON SCROLL =====
-    const observerOptions = {
-      threshold: 0.1,
-      rootMargin: '0px 0px -50px 0px'
-    };
+    <script>
+        // --- MOCK DATA & STATE ---
+        const tg = window.Telegram.WebApp;
+        tg.expand();
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.style.opacity = '1';
-          entry.target.style.transform = 'translateY(0)';
-        }
-      });
-    }, observerOptions);
+        // Текущий пользователь (из ТГ или заглушка)
+        const currentUser = {
+            id: tg.initDataUnsafe?.user?.id || 12345,
+            username: tg.initDataUnsafe?.user?.username || "User",
+            avatar: tg.initDataUnsafe?.user?.photo_url || "https://via.placeholder.com/80",
+            rating: 4.8
+        };
 
-    document.querySelectorAll('.animate').forEach(el => {
-      el.style.opacity = '0';
-      el.style.transform = 'translateY(20px)';
-      el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-      observer.observe(el);
-    });
+        // Хранилище данных (в реальном приложении - Backend)
+        let db = {
+            jobs: [
+                { id: 1, userId: 99, title: "Помочь с переездом", desc: "Нужно спустить диван с 3 этажа без лифта.", price: 2500, date: "2026-08-12T14:00", user: { name: "Alex_Builder", avatar: "https://via.placeholder.com/80/333", rating: 4.5 } },
+                { id: 2, userId: 88, title: "Выгул корги", desc: "Ищем няню для корги на 2 часа вечером.", price: 800, date: "2026-08-11T18:00", user: { name: "DogLover", avatar: "https://via.placeholder.com/80/444", rating: 5.0 } },
+                { id: 3, userId: 77, title: "Настроить принтер", desc: "HP не печатает, мигает красным.", price: 1000, date: "2026-08-10T12:00", user: { name: "TechGuy", avatar: "https://via.placeholder.com/80/555", rating: 3.2 } }
+            ],
+            reviews: [
+                { id: 1, targetUserId: 12345, author: "ClientOne", avatar: "https://via.placeholder.com/40", stars: 5, text: "Отличная работа, все сделано быстро!" },
+                { id: 2, targetUserId: 12345, author: "ClientTwo", avatar: "https://via.placeholder.com/40", stars: 4, text: "Хорошо, но немного опоздал." }
+            ]
+        };
 
-    // ===== TAB NAVIGATION =====
-    document.querySelectorAll('.tab-item').forEach(tab => {
-      tab.addEventListener('click', (e) => {
-        // Only handle non-action tabs
-        if (tab.getAttribute('onclick')) return;
-        
-        e.preventDefault();
-        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        
-        // Smooth scroll to section
-        const target = tab.getAttribute('href');
-        if (target && target !== '#') {
-          document.querySelector(target)?.scrollIntoView({ behavior: 'smooth' });
-        }
-      });
-    });
+        let currentViewingUserId = null;
+        let captchaResult = 0;
+        let selectedReviewStars = 0;
 
-    // ===== PHONE INPUT MASK (Simple) =====
-    document.getElementById('phone')?.addEventListener('input', function(e) {
-      let value = e.target.value.replace(/\D/g, '');
-      if (value.length > 0) value = '+7 (' + value;
-      if (value.length > 4) value = value.slice(0, 4) + ') ' + value.slice(4);
-      if (value.length > 9) value = value.slice(0, 9) + '-' + value.slice(9);
-      if (value.length > 12) value = value.slice(0, 12) + '-' + value.slice(12);
-      e.target.value = value.slice(0, 18);
-    });
+        // --- APP LOGIC ---
+        const app = {
+            init: () => {
+                // Установка данных текущего пользователя
+                document.getElementById('my-avatar').src = currentUser.avatar;
+                document.getElementById('my-nick').innerText = `@${currentUser.username}`;
+                app.renderStars('my-stars', currentUser.rating, false);
+                
+                app.renderJobs();
+                app.renderMyJobs();
+                
+                // Слушатели
+                document.getElementById('detail-contact-btn').addEventListener('click', app.contactUser);
+                document.getElementById('detail-user-click').addEventListener('click', () => {
+                    const job = db.jobs.find(j => j.id == document.getElementById('modal-job-detail').dataset.jobId);
+                    if(job) app.openUserProfile(job.userId, job.user);
+                });
+            },
 
-    // ===== INITIALIZE =====
-    document.addEventListener('DOMContentLoaded', () => {
-      // Trigger initial animations
-      setTimeout(() => {
-        document.querySelectorAll('.animate').forEach((el, i) => {
-          el.style.animationDelay = `${i * 0.1}s`;
-        });
-      }, 100);
-    });
-  </script>
+            switchTab: (tabName) => {
+                document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+                document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+                
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                event.currentTarget.classList.add('active');
+
+                if(tabName === 'home') app.renderJobs();
+                if(tabName === 'profile') app.renderMyJobs();
+            },
+
+            // Рендер звезд
+            renderStars: (containerId, rating, interactive = false, onClick = null) => {
+                const container = document.getElementById(containerId);
+                container.innerHTML = '';
+                for(let i=1; i<=5; i++) {
+                    const star = document.createElement('i');
+                    star.className = `fa-solid fa-star star ${i <= Math.round(rating) ? 'filled' : ''}`;
+                    if(interactive) {
+                        star.onclick = () => onClick(i);
+                    } else {
+                        // Для просмотра профиля другого юзера - открытие отзывов
+                        if(!interactive && containerId === 'profile-stars') {
+                            star.style.cursor = 'default'; 
+                        }
+                    }
+                    container.appendChild(star);
+                }
+            },
+
+            // Рендер списка заданий (Главная)
+            renderJobs: () => {
+                const list = document.getElementById('jobs-list');
+                list.innerHTML = '';
+                // Перемешивание массива
+                const shuffled = [...db.jobs].sort(() => 0.5 - Math.random());
+                
+                shuffled.forEach(job => {
+                    const dateObj = new Date(job.date);
+                    const dateStr = dateObj.toLocaleDateString('ru-RU') + ' ' + dateObj.toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'});
+                    
+                    const card = document.createElement('div');
+                    card.className = 'pill-card';
+                    card.innerHTML = `
+                        <div class="job-header">
+                            <div class="job-title">${job.title}</div>
+                            <div class="job-price">${job.price}₽</div>
+                        </div>
+                        <div class="job-date">${dateStr}</div>
+                    `;
+                    card.onclick = () => app.openJobDetail(job);
+                    list.appendChild(card);
+                });
+            },
+
+            // Создание задания
+            createJob: () => {
+                const title = document.getElementById('create-title').value;
+                const desc = document.getElementById('create-desc').value;
+                const price = document.getElementById('create-price').value;
+                const date = document.getElementById('create-date').value;
+
+                if(!title || !desc || !price || !date) {
+                    tg.showAlert("Заполните все поля!");
+                    return;
+                }
+
+                const newJob = {
+                    id: Date.now(),
+                    userId: currentUser.id,
+                    title, desc, price, date,
+                    user: { name: currentUser.username, avatar: currentUser.avatar, rating: currentUser.rating }
+                };
+
+                db.jobs.push(newJob);
+                
+                // Очистка формы
+                document.getElementById('create-title').value = '';
+                document.getElementById('create-desc').value = '';
+                document.getElementById('create-price').value = '';
+                document.getElementById('create-date').value = '';
+                
+                tg.showPopup({ message: "Объявление создано!" });
+                app.switchTab('home');
+            },
+
+            // Открытие деталей задания
+            openJobDetail: (job) => {
+                const modal = document.getElementById('modal-job-detail');
+                modal.dataset.jobId = job.id;
+                
+                document.getElementById('detail-title').innerText = job.title;
+                document.getElementById('detail-price').innerText = `${job.price}₽`;
+                document.getElementById('detail-desc').innerText = job.desc;
+                
+                const dateObj = new Date(job.date);
+                document.getElementById('detail-date').innerText = `📅 ${dateObj.toLocaleDateString('ru-RU')} в ${dateObj.toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'})}`;
+                
+                document.getElementById('detail-avatar').src = job.user.avatar;
+                document.getElementById('detail-username').innerText = `@${job.user.name}`;
+                document.getElementById('detail-rating').innerHTML = `★ ${job.user.rating}`;
+                
+                // Сохраняем ссылку для кнопки "Написать"
+                modal.dataset.tgLink = `https://t.me/${job.user.name}`;
+                modal.dataset.jobTitle = job.title;
+                
+                modal.classList.add('open');
+            },
+
+            contactUser: () => {
+                const modal = document.getElementById('modal-job-detail');
+                const link = modal.dataset.tgLink;
+                const jobTitle = modal.dataset.jobTitle;
+                const text = encodeURIComponent(`Здравствуйте! Я по поводу работы - «${jobTitle}»`);
+                
+                // В TMA используем tg.openTelegramLink или window.open
+                const fullLink = `${link}?text=${text}`;
+                tg.openTelegramLink(fullLink);
+            },
+
+            // Открытие профиля пользователя
+            openUserProfile: (userId, userData) => {
+                currentViewingUserId = userId;
+                document.getElementById('modal-job-detail').classList.remove('open');
+                
+                const modal = document.getElementById('modal-user-profile');
+                document.getElementById('profile-avatar').src = userData.avatar;
+                document.getElementById('profile-nick').innerText = `@${userData.name}`;
+                
+                app.renderStars('profile-stars', userData.rating);
+                
+                // Рендер отзывов
+                const reviewsList = document.getElementById('profile-reviews-list');
+                reviewsList.innerHTML = '';
+                const userReviews = db.reviews.filter(r => r.targetUserId === userId);
+                
+                if(userReviews.length === 0) {
+                    reviewsList.innerHTML = '<p style="color:#555; text-align:center; padding:20px;">Нет отзывов</p>';
+                } else {
+                    userReviews.forEach(rev => {
+                        let starsHtml = '';
+                        for(let i=0; i<rev.stars; i++) starsHtml += '<i class="fa-solid fa-star" style="color:#FFD700; font-size:10px;"></i>';
+                        
+                        const pill = document.createElement('div');
+                        pill.className = 'pill-card review-pill';
+                        pill.innerHTML = `
+                            <img src="${rev.avatar}" class="avatar" style="width:40px; height:40px;">
+                            <div class="review-content">
+                                <div style="font-weight:600; font-size:13px;">@${rev.author}</div>
+                                <div style="margin: 2px 0;">${starsHtml}</div>
+                                <div class="review-text">${rev.text}</div>
+                            </div>
+                        `;
+                        reviewsList.appendChild(pill);
+                    });
+                }
+                
+                modal.classList.add('open');
+            },
+
+            // Процесс оставления отзыва
+            startReviewProcess: () => {
+                // Генерация капчи
+                const a = Math.floor(Math.random() * 10) + 1;
+                const b = Math.floor(Math.random() * 10) + 1;
+                captchaResult = a + b;
+                document.getElementById('captcha-question').innerText = `${a} + ${b} = ?`;
+                document.getElementById('captcha-answer').value = '';
+                
+                document.getElementById('modal-captcha').classList.add('open');
+            },
+
+            verifyCaptcha: () => {
+                const val = parseInt(document.getElementById('captcha-answer').value);
+                if(val === captchaResult) {
+                    document.getElementById('modal-captcha').classList.remove('open');
+                    // Открыть форму отзыва
+                    selectedReviewStars = 0;
+                    document.getElementById('review-text').value = '';
+                    app.updateCharCounter();
+                    app.renderStars('review-stars-input', 0, true, (n) => {
+                        selectedReviewStars = n;
+                        app.renderStars('review-stars-input', n, true, arguments.callee); // перерисовка
+                    });
+                    document.getElementById('modal-review-form').classList.add('open');
+                } else {
+                    tg.showAlert("Неверный ответ!");
+                }
+            },
+
+            updateCharCounter: () => {
+                const txt = document.getElementById('review-text').value;
+                const len = txt.length;
+                const counter = document.getElementById('char-counter');
+                counter.innerText = `${len}/150`;
+                
+                counter.classList.remove('valid', 'invalid');
+                if(len === 0) counter.style.color = '#555';
+                else if(len >= 15 && len <= 100) counter.classList.add('valid');
+                else counter.classList.add('invalid');
+            },
+
+            submitReview: () => {
+                const txt = document.getElementById('review-text').value;
+                if(selectedReviewStars === 0) { tg.showAlert("Выберите количество звезд!"); return; }
+                if(txt.length < 15 || txt.length > 100) { tg.showAlert("Отзыв должен быть от 15 до 100 символов!"); return; }
+
+                db.reviews.push({
+                    id: Date.now(),
+                    targetUserId: currentViewingUserId,
+                    author: currentUser.username,
+                    avatar: currentUser.avatar,
+                    stars: selectedReviewStars,
+                    text: txt
+                });
+
+                tg.showPopup({ message: "Спасибо за отзыв!" });
+                document.getElementById('modal-review-form').classList.remove('open');
+                // Обновляем список отзывов в открытом профиле
+                app.openUserProfile(currentViewingUserId, { 
+                    name: document.getElementById('profile-nick').innerText.replace('@',''), 
+                    avatar: document.getElementById('profile-avatar').src,
+                    rating: 0 // Рейтинг пересчитается на бэкенде
+                });
+            },
+
+            // Рендер моих объявлений
+            renderMyJobs: () => {
+                const list = document.getElementById('my-jobs-list');
+                list.innerHTML = '';
+                const myJobs = db.jobs.filter(j => j.userId === currentUser.id);
+                
+                if(myJobs.length === 0) {
+                    list.innerHTML = '<p style="color:#555; text-align:center; padding:20px;">У вас пока нет объявлений</p>';
+                    return;
+                }
+
+                myJobs.forEach(job => {
+                    const card = document.createElement('div');
+                    card.className = 'pill-card';
+                    card.innerHTML = `
+                        <div class="manage-btn" onclick="event.stopPropagation(); this.nextElementSibling.classList.toggle('hidden')">
+                            <i class="fa-solid fa-gear" style="color:white;"></i>
+                        </div>
+                        <div class="manage-menu hidden">
+                            <div class="action-icon action-edit" onclick="event.stopPropagation(); app.editJob(${job.id})"><i class="fa-solid fa-pencil"></i></div>
+                            <div class="action-icon action-delete" onclick="event.stopPropagation(); app.deleteJob(${job.id})"><i class="fa-solid fa-trash"></i></div>
+                        </div>
+                        <div class="job-header">
+                            <div class="job-title">${job.title}</div>
+                            <div class="job-price">${job.price}₽</div>
+                        </div>
+                        <div class="job-date">${new Date(job.date).toLocaleDateString()}</div>
+                    `;
+                    list.appendChild(card);
+                });
+            },
+
+            editJob: (id) => {
+                const job = db.jobs.find(j => j.id === id);
+                if(!job) return;
+                
+                // Переключаем на вкладку создания и заполняем поля
+                app.switchTab('create');
+                document.getElementById('create-title').value = job.title;
+                document.getElementById('create-desc').value = job.desc;
+                document.getElementById('create-price').value = job.price;
+                document.getElementById('create-date').value = job.date;
+                
+                // Меняем логику кнопки (упрощено: удаляем старое и создаем новое с тем же ID)
+                const btn = document.querySelector('#tab-create .gradient-btn');
+                btn.innerText = "Сохранить изменения";
+                btn.onclick = () => {
+                    job.title = document.getElementById('create-title').value;
+                    job.desc = document.getElementById('create-desc').value;
+                    job.price = document.getElementById('create-price').value;
+                    job.date = document.getElementById('create-date').value;
+                    
+                    btn.innerText = "Создать объявление";
+                    btn.onclick = () => app.createJob();
+                    tg.showPopup({ message: "Изменения сохранены!" });
+                    app.switchTab('profile');
+                };
+            },
+
+            deleteJob: (id) => {
+                tg.showConfirm({ message: "Удалить это объявление?" }, (confirmed) => {
+                    if(confirmed) {
+                        db.jobs = db.jobs.filter(j => j.id !== id);
+                        app.renderMyJobs();
+                    }
+                });
+            }
+        };
+
+        // Запуск
+        app.init();
+
+    </script>
 </body>
 </html>
