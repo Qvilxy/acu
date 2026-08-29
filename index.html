@@ -14,7 +14,8 @@
             margin: 0;
             padding: 0;
             -webkit-tap-highlight-color: transparent;
-            user-select: none;
+            user-select: none; /* Запрет выделения текста */
+            -webkit-user-select: none;
         }
 
         body {
@@ -55,25 +56,20 @@
             pointer-events: none;
         }
 
-        /* --- Шапка приложения (С учетом безопасной зоны iPhone) --- */
+        /* --- Шапка приложения --- */
         header {
-            /* Отступ сверху для статус-бара iPhone (обычно 20-45px) + немного воздуха */
             padding-top: env(safe-area-inset-top, 20px); 
             padding-bottom: 10px;
-            padding-left: 20px;
-            padding-right: 20px;
-            
             display: flex;
             justify-content: center;
             align-items: center;
-            background: rgba(0, 0, 0, 0.1); /* Легкое затемнение */
+            background: rgba(0, 0, 0, 0.1);
             flex-shrink: 0;
             z-index: 10;
             width: 100%;
         }
 
         .header-logo {
-            /* Размер под ваше фото: широкий и невысокий */
             height: 25px; 
             width: auto;
             max-width: 80%;
@@ -86,7 +82,6 @@
             flex-grow: 1;
             position: relative;
             overflow-y: auto;
-            /* Отступ снизу, чтобы контент не перекрывался парящим меню */
             padding-bottom: 120px; 
             width: 100%;
         }
@@ -99,7 +94,7 @@
         }
 
         .tab-content.active {
-            display: block; /* Просто блок, без центрирования Flex, чтобы фон был чистым */
+            display: block;
         }
 
         @keyframes fadeIn {
@@ -114,7 +109,7 @@
             align-items: center;
             justify-content: center;
             height: 100%;
-            color: rgba(255, 255, 255, 0.5);
+            color: rgba(255, 255, 255, 0.4);
             font-size: 1.2em;
             font-weight: 500;
         }
@@ -127,7 +122,6 @@
             justify-content: center;
             height: 100%;
             gap: 12px;
-            /* Убрал фон контейнера, чтобы было чище, или можно оставить легким */
         }
 
         .user-avatar {
@@ -153,26 +147,37 @@
             font-weight: 500;
         }
 
-        /* --- ПАРЯЩЕЕ МЕНЮ (Floating Pill Navigation) --- */
+        /* --- ПАРЯЩЕЕ МЕНЮ (Liquid Glass Style) --- */
         nav {
             position: fixed;
-            bottom: 25px; /* Отступ от низа экрана */
+            bottom: 25px;
             left: 50%;
             transform: translateX(-50%);
             width: 92%;
             max-width: 420px;
             height: 70px;
             
-            /* Дизайн "таблетки" */
-            background: rgba(255, 255, 255, 0.95); /* Почти белый фон */
-            border-radius: 40px; /* Сильное скругление */
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); /* Глубокая тень */
+            /* Цвет фона меню: чуть темнее основного градиента */
+            background: #3a0b22; 
+            border-radius: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05); /* Тонкая рамка для объема */
             
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 6px; /* Внутренний отступ */
+            padding: 6px;
             z-index: 1000;
+            overflow: hidden; /* Чтобы плитка не вылезала при анимации за пределы скругления */
+        }
+
+        /* Контейнер для элементов навигации */
+        .nav-track {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            z-index: 2; /* Поверх плитки */
         }
 
         .nav-item {
@@ -183,10 +188,10 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            border-radius: 35px; /* Скругление для активной плитки */
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            color: #8E8E93; /* Неактивный цвет */
+            transition: color 0.3s;
             position: relative;
-            color: #8E8E93; /* Цвет неактивных элементов (темно-серый) */
+            z-index: 2;
         }
 
         .nav-item svg {
@@ -203,20 +208,37 @@
             letter-spacing: 0.3px;
         }
 
-        /* Состояние активной вкладки */
-        .nav-item.active {
-            background-color: #D1D1D6; /* Светло-серая "плитка" */
-            color: #F2F2F7; /* Очень светло-серый (почти белый) текст и иконка */
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+        /* Активный текст и иконка становятся светлыми */
+        .nav-item.active-text {
+            color: #F2F2F7;
         }
 
-        .nav-item.active svg {
-            transform: scale(1.05);
+        /* --- LIQUID GLASS PILLS (Плитка) --- */
+        .glass-pill {
+            position: absolute;
+            top: 6px; /* Отступ сверху внутри nav */
+            left: 6px; /* Начальная позиция (будет изменена JS) */
+            width: calc(33.33% - 8px); /* Ширина одной секции минус отступы */
+            height: calc(100% - 12px);
+            border-radius: 32px;
+            z-index: 1; /* Под текстом */
+            
+            /* Эффект жидкого стекла */
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+            
+            /* Плавность движения при отпускании (snap) */
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); 
+            will-change: transform;
         }
 
-        /* Эффект нажатия */
-        .nav-item:active {
-            transform: scale(0.96);
+        /* Класс для отключения плавности во время перетаскивания (чтобы следовала за пальцем мгновенно) */
+        .glass-pill.dragging {
+            transition: none !important;
+            background: rgba(255, 255, 255, 0.25); /* Чуть ярче при таскании */
         }
 
     </style>
@@ -228,23 +250,23 @@
         <img src="bcblogo.PNG" alt="BCB Logo" class="loading-logo">
     </div>
 
-    <!-- Шапка с логотипом -->
+    <!-- Шапка -->
     <header>
         <img src="bcbtextlogo.PNG" alt="BCB Text Logo" class="header-logo">
     </header>
 
     <!-- Контент -->
     <main>
-        <!-- Вкладка 1: Играть (Главная) - ПУСТАЯ -->
-        <div id="tab-play" class="tab-content active">
-            <!-- Здесь ничего нет, только фон -->
-        </div>
-
-        <!-- Вкладка 2: В разработке - МИНИМАЛИСТИЧНАЯ -->
+        <!-- Вкладка 1: В разработке (Первая по порядку) -->
         <div id="tab-dev" class="tab-content">
             <div class="dev-placeholder">
                 <p>Раздел в разработке</p>
             </div>
+        </div>
+
+        <!-- Вкладка 2: Играть (Открывается первой при старте) -->
+        <div id="tab-play" class="tab-content active">
+            <!-- Пустой фон -->
         </div>
 
         <!-- Вкладка 3: Профиль -->
@@ -257,27 +279,30 @@
         </div>
     </main>
 
-    <!-- Парящее меню навигации -->
-    <nav>
-        <!-- Вкладка Играть -->
-        <div class="nav-item active" data-target="tab-play">
-            <!-- Иконка Джойстика/Игры -->
-            <svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
-            <span>Играть</span>
-        </div>
-        
-        <!-- Вкладка В разработке -->
-        <div class="nav-item" data-target="tab-dev">
-            <!-- Иконка Шестеренки -->
-            <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.49-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-            <span>В разработке</span>
-        </div>
-        
-        <!-- Вкладка Профиль -->
-        <div class="nav-item" data-target="tab-profile">
-            <!-- Иконка Пользователя -->
-            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-            <span>Профиль</span>
+    <!-- Меню навигации -->
+    <nav id="nav-bar">
+        <!-- Плавающая плитка (Liquid Glass) -->
+        <div class="glass-pill" id="active-pill"></div>
+
+        <!-- Трек с кнопками -->
+        <div class="nav-track">
+            <!-- Вкладка 1 -->
+            <div class="nav-item" data-target="tab-dev" data-index="0">
+                <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.49-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                <span>В разработке</span>
+            </div>
+            
+            <!-- Вкладка 2 -->
+            <div class="nav-item active-text" data-target="tab-play" data-index="1">
+                <svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+                <span>Играть</span>
+            </div>
+            
+            <!-- Вкладка 3 -->
+            <div class="nav-item" data-target="tab-profile" data-index="2">
+                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                <span>Профиль</span>
+            </div>
         </div>
     </nav>
 
@@ -286,68 +311,160 @@
         const tg = window.Telegram.WebApp;
         tg.ready();
         tg.expand();
-        
-        // Установка цветов темы
-        tg.setHeaderColor('#4a0e2d'); // Темный бордовый
+        tg.setHeaderColor('#4a0e2d');
         tg.setBackgroundColor('#4a0e2d');
 
         // --- Данные пользователя ---
         const user = tg.initDataUnsafe.user || {};
-        
         const avatarImg = document.getElementById('profile-avatar');
         const nameDiv = document.getElementById('profile-name');
         const usernameDiv = document.getElementById('profile-username');
 
-        // Заполнение профиля
         if (user.photo_url) {
             avatarImg.src = user.photo_url;
         } else {
-            // Дефолтная аватарка, если нет фото
             avatarImg.src = 'https://via.placeholder.com/150/ffffff/4a0e2d?text=User';
         }
-
         nameDiv.textContent = user.first_name + (user.last_name ? ' ' + user.last_name : '') || 'Игрок BCB';
         usernameDiv.textContent = user.username ? '@' + user.username : 'Нет юзернейма';
 
-
         // --- Логика загрузки ---
         const loadingScreen = document.getElementById('loading-screen');
-        
         window.addEventListener('load', () => {
             setTimeout(() => {
                 loadingScreen.classList.add('hidden');
-                setTimeout(() => {
-                    loadingScreen.style.display = 'none';
-                }, 600);
-            }, 2000); // 2 секунды заставки
+                setTimeout(() => { loadingScreen.style.display = 'none'; }, 600);
+            }, 2000);
         });
 
-
-        // --- Логика навигации ---
+        // --- ФИЗИКА МЕНЮ И DRAG-AND-DROP ---
+        const navBar = document.getElementById('nav-bar');
+        const pill = document.getElementById('active-pill');
         const navItems = document.querySelectorAll('.nav-item');
         const tabContents = document.querySelectorAll('.tab-content');
 
-        navItems.forEach(item => {
+        let currentIndex = 1; // Начинаем с "Играть" (индекс 1)
+        let isDragging = false;
+        let startX = 0;
+        let currentTranslateX = 0; // Текущее смещение плитки в пикселях
+        
+        // Вычисляем ширину одной вкладки (примерно)
+        // Мы делаем это динамически, так как ширина экрана может меняться
+        function getStepWidth() {
+            return navBar.offsetWidth / 3;
+        }
+
+        // Функция обновления позиции плитки
+        function updatePillPosition(index, animate = true) {
+            const step = getStepWidth();
+            // Смещаем на index * шаг. 
+            // CSS left у нас 6px, поэтому transform 0 будет ровно на первой вкладке.
+            const xPos = index * step; 
+            
+            if (!animate) {
+                pill.classList.add('dragging');
+            } else {
+                pill.classList.remove('dragging');
+            }
+            
+            pill.style.transform = `translateX(${xPos}px)`;
+            currentTranslateX = xPos;
+        }
+
+        // Инициализация позиции (ставим на "Играть")
+        // Небольшая задержка, чтобы layout успел просчитаться
+        setTimeout(() => {
+            updatePillPosition(currentIndex, false);
+        }, 100);
+
+        // Обработчики событий для перетаскивания (Touch и Mouse)
+        const startDrag = (clientX) => {
+            isDragging = true;
+            startX = clientX - currentTranslateX;
+            pill.classList.add('dragging');
+            tg.HapticFeedback.selectionChanged(); // Легкая вибрация при начале
+        };
+
+        const moveDrag = (clientX) => {
+            if (!isDragging) return;
+            
+            let newX = clientX - startX;
+            const step = getStepWidth();
+            const maxIndex = 2;
+            
+            // Ограничиваем движение границами меню (с небольшим выходом за края для эффекта)
+            const limit = step * 0.5; 
+            if (newX < -limit) newX = -limit;
+            if (newX > (maxIndex * step) + limit) newX = (maxIndex * step) + limit;
+
+            pill.style.transform = `translateX(${newX}px)`;
+            currentTranslateX = newX;
+        };
+
+        const endDrag = () => {
+            if (!isDragging) return;
+            isDragging = false;
+            pill.classList.remove('dragging');
+
+            const step = getStepWidth();
+            // Вычисляем ближайший индекс
+            let newIndex = Math.round(currentTranslateX / step);
+            
+            // Корректируем границы
+            if (newIndex < 0) newIndex = 0;
+            if (newIndex > 2) newIndex = 2;
+
+            // Если индекс изменился, переключаем вкладку
+            if (newIndex !== currentIndex) {
+                switchTab(newIndex);
+            }
+
+            // Примагничиваем плитку
+            updatePillPosition(newIndex, true);
+            tg.HapticFeedback.impactOccurred('light'); // Вибрация при "щелчке"
+        };
+
+        // Переключение вкладок
+        function switchTab(newIndex) {
+            currentIndex = newIndex;
+            
+            // Обновляем текст (цвета иконок)
+            navItems.forEach(item => item.classList.remove('active-text'));
+            navItems[currentIndex].classList.add('active-text');
+
+            // Обновляем контент
+            tabContents.forEach(tab => tab.classList.remove('active'));
+            const targetId = navItems[currentIndex].getAttribute('data-target');
+            document.getElementById(targetId).classList.add('active');
+        }
+
+        // Привязка событий Touch (для телефонов)
+        navBar.addEventListener('touchstart', (e) => startDrag(e.touches[0].clientX), {passive: false});
+        window.addEventListener('touchmove', (e) => {
+            if(isDragging) e.preventDefault(); // Блокируем скролл страницы пока тащим меню
+            moveDrag(e.touches[0].clientX);
+        }, {passive: false});
+        window.addEventListener('touchend', endDrag);
+
+        // Привязка событий Mouse (для тестов на ПК)
+        navBar.addEventListener('mousedown', (e) => startDrag(e.clientX));
+        window.addEventListener('mousemove', (e) => moveDrag(e.clientX));
+        window.addEventListener('mouseup', endDrag);
+
+        // Клик по вкладке (если просто кликнули, а не тянули)
+        navItems.forEach((item, index) => {
             item.addEventListener('click', () => {
-                // Если уже активна, ничего не делаем
-                if (item.classList.contains('active')) return;
-
-                // Убираем активный класс у всех
-                navItems.forEach(nav => nav.classList.remove('active'));
-                tabContents.forEach(tab => tab.classList.remove('active'));
-
-                // Добавляем активный класс нажатой кнопке
-                item.classList.add('active');
-
-                // Показываем соответствующий таб
-                const targetId = item.getAttribute('data-target');
-                document.getElementById(targetId).classList.add('active');
-                
-                // Тактильный отклик (вибрация)
-                if(tg.HapticFeedback) {
+                if (!isDragging && index !== currentIndex) {
+                    switchTab(index);
+                    updatePillPosition(index, true);
                     tg.HapticFeedback.impactOccurred('light');
                 }
             });
+        });
+
+        // Пересчет позиции при повороте экрана
+        window.addEventListener('resize', () => {
+            updatePillPosition(currentIndex, false);
         });
 
     </script>
