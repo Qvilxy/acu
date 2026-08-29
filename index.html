@@ -198,7 +198,7 @@
             display: flex;
             flex-direction: column;
             gap: 20px; /* Отступ между плитками */
-            padding: 40px 20px 60px 20px; /* УВЕЛИЧЕНЫ ОТСТУПЫ (особенно снизу 60px), ЧТОБЫ ТЕНЬ БЫЛА ВИДНА */
+            padding: 40px 20px 60px 20px; /* УВЕЛИЧЕНЫ ОТСТУПЫ, ЧТОБЫ ТЕНЬ БЫЛА ВИДНА */
             overflow-y: scroll; /* Разрешаем скролл */
             scroll-behavior: smooth;
             scrollbar-width: none; /* Скрываем стандартный скроллбар */
@@ -831,874 +831,6 @@
 
         function updateSliderState(animate = true) {
             const cards = Array.from(gamesList.children);
-            const centerScroll = gamesList.scrollTop + (Вот обновленный код с исправлениями.
-
-**Что сделано:**
-1.  **Ручной скролл и магнитизм:** Теперь список режимов можно тянуть пальцем (или мышкой). Когда отпускаешь, он плавно «примагничивается» к ближайшему режиму, а ползунок следует за ним.
-2gamesList.clientHeight / 2);
-            
-            let closestCard = null;
-            let minDiff = Infinity;
-            let activeSeqIdx = -1;
-
-            // Находим карточку, чей центр ближе всего к центру экрана
-            cards.forEach((card, i) => {
-                const cardCenter = card.offsetTop + (card.offsetHeight / 2);
-                const diff = Math.abs(centerScroll - cardCenter);
-                if (diff < minDiff) {
-                    minDiff = diff;
-                    closestCard = card;
-                    activeSeqIdx = i;
-                }
-            });
-
-            if (closestCard) {
-                const modeIdx = parseInt(closestCard.dataset.  **Анимация ползунка (Шар ↔ Полоска):**
-    *   Когда режим выбран (магнит сработал) — индикатор превращается в аккуратный **шарик**.
-    *   Когда едет к следующему — растягивается в **полоску**.
-3.  **Исправлена тень:** Увеличил отступы (`padding`) у контейнера игр, чтобы нижняя тень маленькой плитки не обрезалась (как было в красном кругу на фото).
-4.  **Логика отображения (3 плитки):**
-    *   **Режим 1:** Большой квадрат сверху + Плоский прямоугольник (2 режим) + Видна верхушка 3-го режима снизу.
-    *   **Режим 2:** Плоский прямоугольник (1 режим) сверху + Большой квадрат по центру + Плоский прямоугольник (3 режим) снизу.
-    *   **Режим 3:** Плоский прямоугольник (2 режим) сверху + Большой квадрат снизу (и так далее по кругу).
-
-```html
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>BCB Casino</title>
-    
-    <!-- Подключаем скрипт Telegram Web Apps -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
-    <style>
-        /* --- Базовые стили --- */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #4a0e2d, #7b1f4c);
-            color: white;
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* --- Экран загрузки --- */
-        #loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            background: linear-gradient(135deg, #4a0e2d, #7b1f4c);
-            transition: opacity 0.6s ease-out, visibility 0.6s;
-        }
-
-        #loading-screen.loaded {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-
-        .loading-logo {
-            width: 50%;
-            max-width: 250px;
-            height: auto;
-            object-fit: contain;
-        }
-
-        /* --- ШАПКА ПРИЛОЖЕНИЯ --- */
-        header {
-            height: 120px; 
-            padding-top: env(safe-area-inset-top, 20px); 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: transparent; 
-            flex-shrink: 0;
-            z-index: 10;
-            width: 100%;
-            position: relative; 
-        }
-
-        .header-logo {
-            max-height: 80px; 
-            width: auto;
-            max-width: 90%;
-            object-fit: contain;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
-        }
-
-        /* --- БАЛАНС (КОМПАКТНЫЙ) --- */
-        .balance-pill {
-            position: absolute;
-            top: calc(env(safe-area-inset-top, 20px) + 52px); 
-            right: 16px; 
-            
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            
-            height: 26px; 
-            min-width: 52px; 
-            width: auto; 
-            padding: 0 8px; 
-            gap: 4px; 
-            
-            background: linear-gradient(180deg, #FCD34D 0%, #F59E0B 100%);
-            border-radius: 13px; 
-            box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            
-            z-index: 20;
-            transition: width 0.2s ease, opacity 0.3s ease, transform 0.3s ease;
-        }
-
-        .balance-pill.hidden {
-            opacity: 0;
-            pointer-events: none;
-            transform: scale(0.9);
-        }
-
-        .balance-text {
-            font-size: 14px; 
-            font-weight: 700;
-            color: #fff;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-            line-height: 1;
-            white-space: nowrap; 
-        }
-
-        .balance-star-img {
-            height: 27px; 
-            width: auto;
-            object-fit: contain;
-            display: block;
-        }
-
-        /* --- Основной контент --- */
-        main {
-            flex-grow: 1;
-            position: relative;
-            overflow-y: auto;
-            padding-bottom: 120px; 
-            width: 100%;
-        }
-
-        .tab-content {
-            display: none;
-            width: 100%;
-            min-height: 100%;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Вкладка "Рефералы" */
-        .dev-placeholder {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 1.2em;
-            font-weight: 500;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        /* --- ВКЛАДКА ИГРАТЬ (СЛАЙДЕР РЕЖИМОВ) --- */
-        #tab-play {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            height: 100%;
-            position: relative;
-            overflow: hidden; /* Важно для скрытия лишнего */
-        }
-        
-        #tab-play.active {
-            display: flex;
-        }
-
-        /* Контейнер для списка игр и ползунка */
-        .games-wrapper {
-            display: flex;
-            width: 100%;
-            height: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-            position: relative;
-        }
-
-        /* Область с карточками (СКРОЛЛИТСЯ) */
-        .games-list {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 20px; /* Отступ между плитками */
-            padding: 40px 20px 60px 20px; /* УВЕЛИЧЕНЫ ОТСТУПЫ (особенно снизу 60px), ЧТОБЫ ТЕНЬ БЫЛА ВИДНА */
-            overflow-y: scroll; /* Разрешаем скролл */
-            scroll-behavior: smooth;
-            scrollbar-width: none; /* Скрываем стандартный скроллбар */
-            -ms-overflow-style: none;
-            touch-action: pan-y; /* Разрешаем вертикальный свайп */
-            height: 100%;
-        }
-        
-        .games-list::-webkit-scrollbar {
-            display: none;
-        }
-
-        /* Общий стиль карточки игры */
-        .game-card {
-            background: #2A2A2A;
-            border-radius: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.4); /* Глубокая тень */
-            border: 1px solid rgba(255,255,255,0.05);
-            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-            position: relative;
-            flex-shrink: 0; /* Чтобы не сжимались */
-        }
-
-        /* Иконка замка */
-        .lock-icon {
-            width: 60px;
-            height: 60px;
-            fill: white;
-            opacity: 0.8;
-        }
-
-        /* БОЛЬШАЯ КАРТОЧКА (Квадрат) */
-        .game-card.large {
-            width: 100%;
-            aspect-ratio: 1 / 1; /* Строгий квадрат */
-            transform: scale(1);
-            z-index: 2;
-        }
-
-        /* МАЛЕНЬКАЯ КАРТОЧКА (Плоский прямоугольник) */
-        .game-card.small {
-            width: 100%;
-            height: 120px; /* Фиксированная небольшая высота */
-            opacity: 0.7;
-            transform: scale(0.9);
-            z-index: 1;
-        }
-
-        /* ПОЛЗУНОК СПРАВА */
-        .scroll-track-container {
-            width: 20px; /* Немного шире для удобства */
-            height: 100%;
-            position: relative;
-            display: flex;
-            justify-content: center;
-        }
-
-        .scroll-track {
-            width: 4px;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            position: relative;
-        }
-
-        /* Активный индикатор */
-        .track-indicator {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 12px; /* Ширина шарика */
-            height: 12px; /* Высота шарика */
-            background: #FCD34D;
-            border-radius: 50%; /* По умолчанию шар */
-            box-shadow: 0 0 15px rgba(252, 211, 77, 0.8);
-            transition: top 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), height 0.3s ease, border-radius 0.3s ease;
-            z-index: 2;
-        }
-        
-        /* Класс для превращения в полоску при движении */
-        .track-indicator.stretching {
-            height: 40px; /* Становится длинной полоской */
-            border-radius: 10px;
-            background: #F59E0B;
-        }
-
-
-        /* Стили для вкладки "Профиль" */
-        .profile-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            gap: 6px;
-        }
-
-        .user-avatar {
-            width: 110px;
-            height: 110px;
-            border-radius: 50%;
-            border: 4px solid rgba(255, 255, 255, 0.15);
-            object-fit: cover;
-            background-color: rgba(0, 0, 0, 0.2);
-            box-shadow: none; 
-            margin-bottom: 10px;
-        }
-
-        .user-name-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            line-height: 1; 
-        }
-
-        .user-name {
-            font-size: 1.6em;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            text-shadow: none; 
-            margin-bottom: 2px; 
-        }
-
-        .user-username {
-            font-size: 1.1em;
-            color: rgba(255, 255, 255, 0.6);
-            font-weight: 500;
-            margin-top: 0; 
-            padding-top: 0;
-        }
-
-        /* --- ПАРЯЩЕЕ МЕНЮ --- */
-        nav {
-            position: fixed;
-            bottom: 25px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 92%;
-            max-width: 420px;
-            height: 70px;
-            
-            background: #3a0b22; 
-            border-radius: 40px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px;
-            z-index: 1000;
-            overflow: hidden;
-            
-            touch-action: none; 
-            -webkit-touch-callout: none;
-        }
-
-        .nav-track {
-            display: flex;
-            width: 100%;
-            height: 100%;
-            position: relative;
-            z-index: 2;
-        }
-
-        .nav-item {
-            flex: 1;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            color: #8E8E93;
-            transition: color 0.3s;
-            position: relative;
-            z-index: 2;
-        }
-
-        .nav-item svg {
-            width: 24px;
-            height: 24px;
-            margin-bottom: 4px;
-            fill: currentColor;
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            transform-origin: center;
-        }
-
-        .nav-item span {
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.3px;
-        }
-
-        .nav-item.active-text {
-            color: #F2F2F7;
-        }
-
-        /* АНИМАЦИЯ ЦЕПИ */
-        .nav-item.active-text svg.icon-chain {
-            animation: stretchChain 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        @keyframes stretchChain {
-            0% { transform: scaleX(1); }
-            40% { transform: scaleX(1.6); }
-            100% { transform: scaleX(1); }
-        }
-
-        .nav-item.active-text svg.icon-gamepad {
-            animation: pressGamepad 0.4s ease-in-out;
-        }
-        
-        .nav-item.active-text svg.icon-profile {
-            animation: pulseProfile 0.4s ease-in-out;
-        }
-
-        @keyframes pressGamepad {
-            0% { transform: scaleX(1) scaleY(1); }
-            25% { transform: scaleX(0.85) scaleY(1.1) translateX(2px); }
-            50% { transform: scaleX(1) scaleY(1); }
-            75% { transform: scaleX(0.85) scaleY(1.1) translateX(-2px); }
-            100% { transform: scaleX(1) scaleY(1); }
-        }
-
-        @keyframes pulseProfile {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-
-        /* --- ИНДИКАТОР МЕНЮ (ПЛИТКА) --- */
-        .glass-pill {
-            position: absolute;
-            top: 6px;
-            left: 6px;
-            width: var(--pill-width, calc((100% - 12px) / 3)); 
-            height: calc(100% - 12px);
-            border-radius: 32px;
-            z-index: 1;
-            
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            
-            will-change: transform;
-            
-            transform: translateX(var(--tx, 0px)) scale(var(--scale, 1));
-            
-            transition: 
-                background 0.3s ease,
-                border-color 0.3s ease, 
-                box-shadow 0.3s ease; 
-        }
-
-        .glass-pill.dragging,
-        .glass-pill.animating {
-            background: rgba(255, 255, 255, 0.25);
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .glass-pill.dragging {
-            transition: none !important;
-        }
-
-    </style>
-</head>
-<body>
-
-    <!-- Экран загрузки -->
-    <div id="loading-screen">
-        <img src="bcblogo.PNG" alt="BCB Logo" class="loading-logo" onerror="this.style.display='none'">
-    </div>
-
-    <!-- Шапка -->
-    <header>
-        <img src="bcblogotext.PNG" alt="BCB Text Logo" class="header-logo" onerror="this.style.display='none'">
-        
-        <!-- Таблетка баланса -->
-        <div class="balance-pill" id="balance-pill">
-            <span class="balance-text">0</span>
-            <img src="iconcherry.PNG" alt="" class="balance-star-img" onerror="this.style.display='none'">
-        </div>
-    </header>
-
-    <!-- Контент -->
-    <main>
-        <!-- Вкладка 1: Рефералы -->
-        <div id="tab-dev" class="tab-content">
-            <div class="dev-placeholder">
-                <p>Раздел в разработке</p>
-            </div>
-        </div>
-
-        <!-- Вкладка 2: Играть (Слайдер режимов) -->
-        <div id="tab-play" class="tab-content active">
-            <div class="games-wrapper">
-                <!-- Список игр (СКРОЛЛИТСЯ) -->
-                <div class="games-list" id="games-list">
-                    <!-- Карточки генерируются JS -->
-                </div>
-
-                <!-- Ползунок.modeIdx);
-                currentGameIndex = modeIdx; справа -->
-                <div class="scroll-track-container">
-                    <div class="scroll-track">
-                        <div class="track-indicator" id="track-indicator"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Вкладка 3: Профиль -->
-        <div id="tab-profile" class="tab-content">
-            <div class="profile-container">
-                <img id="profile-avatar" src="" alt="Avatar" class="user-avatar">
-                
-                <div class="user-name-wrapper">
-                    <div id="profile-name" class="user-name">Загрузка...</div>
-                    <div id="profile-username" class="user-username">@...</div>
-                </div>
-                
-            </div>
-        </div>
-    </main>
-
-    <!-- Меню навигации -->
-    <nav id="nav-bar">
-        <!-- Плавающая плитка -->
-        <div class="glass-pill" id="active-pill"></div>
-
-        <!-- Трек с кнопками -->
-        <div class="nav-track">
-            <!-- Вкладка 1: РЕФЕРАЛЫ -->
-            <div class="nav-item" data-target="tab-dev" data-index="0">
-                <svg class="icon-chain" viewBox="0 0 24 24">
-                    <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
-                </svg>
-                <span>Рефералы</span>
-            </div>
-            
-            <!-- Вкладка 2: Играть -->
-            <div class="nav-item active-text" data-target="tab-play" data-index="1">
-                <svg class="icon-gamepad" viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
-                <span>Играть</span>
-            </div>
-            
-            <!-- Вкладка 3: Профиль -->
-            <div class="nav-item" data-target="tab-profile" data-index="2">
-                <svg class="icon-profile" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                <span>Профиль</span>
-            </div>
-        </div>
-    </nav>
-
-    <script>
-        // --- 1. БЕЗОПАСНАЯ ИНИЦИАЛИЗАЦИЯ TELEGRAM WEBAPP ---
-        const tg = window.Telegram?.WebApp || null;
-        
-        if (tg) {
-            try {
-                tg.ready();
-                tg.expand();
-                tg.setHeaderColor('#4a0e2d');
-                tg.setBackgroundColor('#4a0e2d');
-            } catch (e) {
-                console.warn('Telegram WebApp init error:', e);
-            }
-        }
-
-        // --- 2. ДАННЫЕ ПОЛЬЗОВАТЕЛЯ ---
-        const user = tg?.initDataUnsafe?.user || {};
-        const avatarImg = document.getElementById('profile-avatar');
-        const nameDiv = document.getElementById('profile-name');
-        const usernameDiv = document.getElementById('profile-username');
-
-        if (user.photo_url) {
-            avatarImg.src = user.photo_url;
-        } else {
-            avatarImg.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjIpIj48cGF0aCBkPSJNMTIgMTJjMi4yMSAwIDQtMS43OSA0LTRzLTEuNzktNC00LTRzLTQgMS43OS00IDRTOS43OSAxMiAxMiAxMnogTTEyIDE0Yy0yLjY3IDAtOCAxLjM0LTggNHYyaDE2di0yQzIwIDE1LjM0IDE0LjY3IDE0IDEyIDE0eiIvPjwvc3ZnPg==';
-        }
-        
-        nameDiv.textContent = user.first_name + (user.last_name ? ' ' + user.last_name : '') || 'Игрок BCB';
-        usernameDiv.textContent = user.username ? '@' + user.username : 'Нет юзернейма';
-
-        // --- 3. ЛОГИКА ЗАГРУЗКИ ---
-        const loadingScreen = document.getElementById('loading-screen');
-        
-        setTimeout(() => {
-            loadingScreen.classList.add('loaded');
-            setTimeout(() => { 
-                if(loadingScreen) loadingScreen.remove(); 
-            }, 600);
-        }, 2000);
-
-        // --- 4. ФИЗИКА МЕНЮ И DRAG-AND-DROP ---
-        const navBar = document.getElementById('nav-bar');
-        const pill = document.getElementById('active-pill');
-        const balancePill = document.getElementById('balance-pill'); 
-        const navItems = document.querySelectorAll('.nav-item');
-        const tabContents = document.querySelectorAll('.tab-content');
-
-        let currentIndex = 1; 
-        let isDragging = false;
-        let startX = 0;
-        let currentTranslateX = 0; 
-        
-        function getStepWidth() { 
-            return navBar ? (navBar.offsetWidth - 12) / 3 : 100; 
-        }
-
-        function updatePillPosition(index, animate = true) {
-            if (!pill || !navBar) return;
-            
-            const step = getStepWidth();
-            const xPos = index * step; 
-            
-            pill.style.setProperty('--pill-width', `${step}px`);
-            
-            if (isDragging) {
-                pill.classList.add('dragging');
-                pill.classList.remove('animating');
-            } else if (!animate) {
-                pill.classList.remove('dragging', 'animating');
-                pill.style.transition = 'none';
-            } else {
-                pill.classList.remove('dragging');
-                pill.classList.add('animating');
-                
-                pill.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease';
-                
-                setTimeout(() => {
-                    if (!isDragging) pill.classList.remove('animating');
-                }, 500);
-            }
-            
-            pill.style.setProperty('--tx', `${xPos}px`);
-            pill.style.setProperty('--scale', isDragging ? 1.1 : 1);
-            
-            currentTranslateX = xPos;
-        }
-
-        function toggleBalanceVisibility(index) {
-            if (!balancePill) return;
-            if (index === 1) {
-                balancePill.classList.remove('hidden');
-            } else {
-                balancePill.classList.add('hidden');
-            }
-        }
-
-        setTimeout(() => {
-            updatePillPosition(currentIndex, false);
-            toggleBalanceVisibility(currentIndex);
-        }, 2100);
-
-        const startDragNav = (clientX) => {
-            isDragging = true;
-            startX = clientX - currentTranslateX;
-            pill.classList.add('dragging');
-            pill.style.setProperty('--scale', 1.1);
-            if(tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
-        };
-
-        const moveDragNav = (clientX) => {
-            if (!isDragging) return;
-            
-            let newX = clientX - startX;
-            const step = getStepWidth();
-            const maxIndex = 2;
-            
-            const limit = step * 0.4; 
-            if (newX < -limit) newX = -limit + (newX + limit) * 0.2;
-            if (newX > (maxIndex * step) + limit) newX = (maxIndex * step) + limit + (newX - ((maxIndex * step) + limit)) * 0.2;
-
-            pill.style.setProperty('--tx', `${newX}px`);
-            currentTranslateX = newX;
-        };
-
-        const endDragNav = () => {
-            if (!isDragging) return;
-            isDragging = false;
-            pill.classList.remove('dragging');
-            
-            const step = getStepWidth();
-            let newIndex = Math.round(currentTranslateX / step);
-            
-            if (newIndex < 0) newIndex = 0;
-            if (newIndex > 2) newIndex = 2;
-
-            if (newIndex !== currentIndex) {
-                switchTab(newIndex);
-            }
-
-            updatePillPosition(newIndex, true);
-            
-            if(tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-        };
-
-        if(navBar) {
-            navBar.addEventListener('touchstart', (e) => startDragNav(e.touches[0].clientX), {passive: false});
-        }
-        window.addEventListener('touchmove', (e) => {
-            if(isDragging) {
-                e.preventDefault(); 
-                moveDragNav(e.touches[0].clientX);
-            }
-        }, {passive: false});
-        window.addEventListener('touchend', endDragNav);
-
-        if(navBar) {
-            navBar.addEventListener('mousedown', (e) => startDragNav(e.clientX));
-        }
-        window.addEventListener('mousemove', (e) => moveDragNav(e.clientX));
-        window.addEventListener('mouseup', endDragNav);
-
-        navItems.forEach((item, index) => {
-            item.addEventListener('click', () => {
-                if (!isDragging && index !== currentIndex) {
-                    switchTab(index);
-                    updatePillPosition(index, true);
-                    if(tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-                }
-            });
-        });
-
-        function switchTab(newIndex) {
-            currentIndex = newIndex;
-            
-            navItems.forEach(item => item.classList.remove('active-text'));
-            navItems[currentIndex].classList.add('active-text');
-
-            tabContents.forEach(tab => tab.classList.remove('active'));
-            const targetId = navItems[currentIndex].getAttribute('data-target');
-            if(targetId) {
-                const targetEl = document.getElementById(targetId);
-                if(targetEl) targetEl.classList.add('active');
-            }
-            
-            toggleBalanceVisibility(newIndex);
-        }
-
-        window.addEventListener('resize', () => {
-            updatePillPosition(currentIndex, false);
-        });
-
-        // --- 5. ЛОГИКА ИГРОВЫХ РЕЖИМОВ (СЛАЙДЕР С МАГНИТОМ) ---
-        const gamesList = document.getElementById('games-list');
-        const trackIndicator = document.getElementById('track-indicator');
-        
-        // Данные режимов
-        const gameModes = [
-            { id: 1, name: 'Рулетка' },
-            { id: 2, name: 'Сапёр' },
-            { id: 3, name: 'Crash' }
-        ];
-
-        // SVG иконка замка
-        const lockSvg = `
-            <svg class="lock-icon" viewBox="0 0 24 24">
-                <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
-            </svg>
-        `;
-
-        let currentGameIndex = 0;
-        let isSliderDragging = false;
-        let startY = 0;
-        let startScrollTop = 0;
-        let autoSwitchInterval;
-
-        // Инициализация
-        function initGamesSlider() {
-            renderInitialCards();
-            updateSliderState(false); // false = без анимации перехода
-            
-            // Обработчики ручного скролла
-            gamesList.addEventListener('touchstart', handleTouchStart, {passive: false});
-            gamesList.addEventListener('touchmove', handleTouchMove, {passive: false});
-            gamesList.addEventListener('touchend', handleTouchEnd);
-            
-            gamesList.addEventListener('mousedown', handleMouseDown);
-            window.addEventListener('mousemove', handleMouseMove);
-            window.addEventListener('mouseup', handleMouseUp);
-
-            // Запуск авто-переключения
-            startAutoSwitch();
-        }
-
-        function renderInitialCards() {
-            gamesList.innerHTML = '';
-            // Создаем бесконечный список: 3-1-2-3-1 (чтобы можно было скроллить вверх и вниз от центра)
-            // Индексы в массиве gameModes: 2, 0, 1, 2, 0
-            
-            const sequence = [2, 0, 1, 2, 0]; 
-            // Центральный элемент (индекс 2 в sequence) это currentGameIndex (0)
-            
-            sequence.forEach((modeIdx, i) => {
-                const card = createCardElement(modeIdx, i);
-                gamesList.appendChild(card);
-            });
-
-            // Скроллим к центральному элементу (индекс 2)
-
-                // Обновляем классы размеров
-            setTimeout(() => {
-                const centerCard = gamesList.children[2];
-                if(centerCard) {
-                    const cardHeight = centerCard.offsetHeight;
-                    const gap = 20;
-                    const containerHeight = gamesList.clientHeight;
-                    // Центрируем: (containerHeight - cardHeight) / 2
-                    const offset = (containerHeight - cardHeight) / 2;
-                    gamesList.scrollTop = (cardHeight + gap) * 2 - offset;
-                }
-                updateSliderState(false);
-            }, 50);
-        }
-
-        function createCardElement(modeIdx, seqIdx) {
-            const div = document.createElement('div');
-            div.className = 'game-card';
-            div.dataset.modeIdx = modeIdx;
-            div.dataset.seqIdx = seqIdx;
-            div.innerHTML = lockSvg;
-            return div;
-        }
-
-        function updateSliderState(animate = true) {
-            const cards = Array.from(gamesList.children);
             const centerScroll = gamesList.scrollTop + (gamesList.clientHeight / 2);
             
             let closestCard = null;
@@ -1722,295 +854,148 @@
 
                 // Обновляем классы размеров
                 cards.forEach(c => {
-                   
-                cards.forEach(c => {
-                    c.className = 'game-card small'; // Сначала c.className = 'game-card small'; // Сначала все маленькие
+                    c.className = 'game-card small'; // Сначала все маленькие
                 });
-                closestCard.className все маленькие
-                });
-                closestCard.className = 'game-card large'; // Активная большая = 'game-card large'; // Активная большая
-
-                // Обновляем ползунок
-                update
+                closestCard.className = 'game-card large'; // Активная большая
 
                 // Обновляем ползунок
                 updateScrollIndicator(activeSeqIdx, animate);
-            }ScrollIndicator(activeSeqIdx, animate);
             }
-        }
-
-        function updateScrollIndicator(seq
         }
 
         function updateScrollIndicator(seqIdx, animate) {
-            // ВсегоIdx, animate) {
-            // Всего точек 3. seqIdx от 0 до  точек 3. seqIdx от 0 до 4 (в нашем буфере 5 элементов4 (в нашем буфере 5 элементов)
-            // Нам нужно мапить seqIdx на )
+            // Всего точек 3. seqIdx от 0 до 4 (в нашем буфере 5 элементов)
             // Нам нужно мапить seqIdx на 0, 1, 2
-            //0, 1, 2
-            // Sequence: [2, 0, 1, Sequence: [2, 0, 1, 2, 0] -> Индексы точек 2, 0] -> Индексы точек: [2, 0, 1,: [2, 0, 1, 2, 0]
-            
-            const dotCount 2, 0]
+            // Sequence: [2, 0, 1, 2, 0] -> Индексы точек: [2, 0, 1, 2, 0]
             
             const dotCount = 3;
-            const trackHeight = = 3;
             const trackHeight = document.querySelector('.scroll-track').offsetHeight;
-            const document.querySelector('.scroll-track').offsetHeight;
-            const indicatorHeight = 12; // Высота indicatorHeight = 12; // Высота шарика
-            
-            // Позиции точек ( шарика
+            const indicatorHeight = 12; // Высота шарика
             
             // Позиции точек (примерно)
-            // Точка 0примерно)
             // Точка 0: 10%
-            // Точ: 10%
             // Точка 1: 50%
-            // Тка 1: 50%
             // Точка 2: 90%
             
-очка 2: 90%
-            
             let percent = 0;
-            if (seq            let percent = 0;
-            if (seqIdx === 0 || seqIdx === Idx === 0 || seqIdx === 3) percent = 90; // Режим3) percent = 90; // Режим 3 (Crash) - внизу или 3 (Crash) - внизу или вверху цикла
-            if (seqIdx === вверху цикла
-            if (seqIdx === 1 || seqIdx === 4) percent =  1 || seqIdx === 4) percent = 10; // Режим 1 (Рулетка)10; // Режим 1 (Рулетка)
-            if (seqIdx === 2) percent =
-            if (seqIdx === 2) percent = 50; // Режим 2 (Сапер 50; // Режим 2 (Сапер) - центр
-
-            // Корректируем логи) - центр
+            if (seqIdx === 0 || seqIdx === 3) percent = 90; // Режим 3 (Crash) - внизу или вверху цикла
+            if (seqIdx === 1 || seqIdx === 4) percent = 10; // Режим 1 (Рулетка)
+            if (seqIdx === 2) percent = 50; // Режим 2 (Сапер) - центр
 
             // Корректируем логику для бесконечного скролла:
-ку для бесконечного скролла:
-            // Мы просто смотрим на currentGameIndex (0            // Мы просто смотрим на currentGameIndex (0, 1, 2)
-            //, 1, 2)
-            // 0 -> 10% (верх 0 -> 10% (верх)
-            // 1 -> 50% ()
+            // Мы просто смотрим на currentGameIndex (0, 1, 2)
+            // 0 -> 10% (верх)
             // 1 -> 50% (центр)
-            // 2 -> 90%центр)
             // 2 -> 90% (низ)
             
-            if (currentGameIndex (низ)
-            
             if (currentGameIndex === 0) percent = 15;
-            === 0) percent = 15;
-            if (currentGameIndex === 1) percent =  if (currentGameIndex === 1) percent = 50;
-            if (currentGameIndex === 50;
+            if (currentGameIndex === 1) percent = 50;
             if (currentGameIndex === 2) percent = 85;
 
-            const top2) percent = 85;
-
-            const topPos = (trackHeight - indicatorHeight) *Pos = (trackHeight - indicatorHeight) * (percent / 100);
- (percent / 100);
+            const topPos = (trackHeight - indicatorHeight) * (percent / 100);
             
-            trackIndicator.style.transition = animate ? 'top            
-            trackIndicator.style.transition = animate ? 'top 0.4s cubic-bezier(0.3 0.4s cubic-bezier(0.34, 1.56, 0.64, 1.56, 0.64, 1), height 0.3s,4, 1), height 0.3s, border-radius 0.3s' : 'none'; border-radius 0.3s' : 'none';
-            trackIndicator.style.top = `${topPos}px`;
+            trackIndicator.style.transition = animate ? 'top 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), height 0.3s, border-radius 0.3s' : 'none';
             trackIndicator.style.top = `${topPos}px`;
 
             // Эффект Шар <-> Полоска
-
-
-            // Эффект Шар <-> Полоска
             if (isSliderDragging) {
-            if (isSliderDragging) {
-                trackIndicator.classList.add('stretching'); // Полос                trackIndicator.classList.add('stretching'); // Полоска
-            } else {
-                trackIndicator.classList.removeка
+                trackIndicator.classList.add('stretching'); // Полоска
             } else {
                 trackIndicator.classList.remove('stretching'); // Шар
             }
-        }('stretching'); // Шар
-            }
         }
-
-        // --- Обработчики Драга для
 
         // --- Обработчики Драга для Слайдера ---
-        function handleTouchStart(e) Слайдера ---
         function handleTouchStart(e) {
             isSliderDragging = true;
-            startY {
-            isSliderDragging = true;
             startY = e.touches[0].clientY;
-            start = e.touches[0].clientY;
             startScrollTop = gamesList.scrollTop;
-            gamesScrollTop = gamesList.scrollTop;
-            gamesList.style.scrollBehavior = 'auto'; // ОтList.style.scrollBehavior = 'auto'; // Отключаем плавность для мгновенной реакции
-            updateключаем плавность для мгновенной реакции
-            updateSliderState(true); // Включаем растяSliderState(true); // Включаем растягивание индикатора
-        }
-
-        functionгивание индикатора
+            gamesList.style.scrollBehavior = 'auto'; // Отключаем плавность для мгновенной реакции
+            updateSliderState(true); // Включаем растягивание индикатора
         }
 
         function handleTouchMove(e) {
-            if (!isSlider handleTouchMove(e) {
             if (!isSliderDragging) return;
-            e.preventDefault(); // БDragging) return;
-            e.preventDefault(); // Блокируем нативный скролл браузера еслилокируем нативный скролл браузера если нужно
-            const deltaY = startY - e.touches[ нужно
+            e.preventDefault(); // Блокируем нативный скролл браузера если нужно
             const deltaY = startY - e.touches[0].clientY;
-            gamesList.scrollTop = start0].clientY;
             gamesList.scrollTop = startScrollTop + deltaY;
-            updateSliderState(trueScrollTop + deltaY;
             updateSliderState(true);
-        }
-
-        function handleTouchEnd);
         }
 
         function handleTouchEnd() {
-            if (!isSliderDragging) return;() {
             if (!isSliderDragging) return;
             isSliderDragging = false;
-            snap
-            isSliderDragging = false;
             snapToNearest();
-        }
-
-        functionToNearest();
         }
 
         function handleMouseDown(e) {
-            isSliderDragging = true handleMouseDown(e) {
             isSliderDragging = true;
             startY = e.clientY;
-            startScroll;
-            startY = e.clientY;
             startScrollTop = gamesList.scrollTop;
-            gamesList.style.scrollTop = gamesList.scrollTop;
             gamesList.style.scrollBehavior = 'auto';
-            updateSliderState(true);Behavior = 'auto';
             updateSliderState(true);
-        }
-
-        function handleMouseMove(e) {
-
         }
 
         function handleMouseMove(e) {
             if (!isSliderDragging) return;
-            const            if (!isSliderDragging) return;
             const deltaY = startY - e.clientY;
-            gamesList deltaY = startY - e.clientY;
             gamesList.scrollTop = startScrollTop + deltaY;
-            updateSlider.scrollTop = startScrollTop + deltaY;
             updateSliderState(true);
-        }
-
-        function handleMouseUpState(true);
         }
 
         function handleMouseUp() {
-            if (!isSliderDragging) return;() {
             if (!isSliderDragging) return;
-            isSliderDragging = false;
-            snapTo
             isSliderDragging = false;
             snapToNearest();
         }
 
-        function snapToNeNearest();
-        }
-
         function snapToNearest() {
-            gamesList.style.scrollBehaviorarest() {
-            gamesList.style.scrollBehavior = 'smooth'; // Включаем п = 'smooth'; // Включаем плавность для магнита
-            updateSliderState(true);лавность для магнита
-            updateSliderState(true); // Возвращаем индикатор в шар // Возвращаем индикатор в шар
+            gamesList.style.scrollBehavior = 'smooth'; // Включаем плавность для магнита
+            updateSliderState(true); // Возвращаем индикатор в шар
             
-            // Небольшая задержка,
-            
-            // Небольшая задержка, чтобы CSS успел переключиться на smooth чтобы CSS успел переключиться на smooth перед изменением scrollTop
+            // Небольшая задержка, чтобы CSS успел переключиться на smooth перед изменением scrollTop
             setTimeout(() => {
- перед изменением scrollTop
-            setTimeout(() => {
-                const cards = Array.from(gamesList.children);
                 const cards = Array.from(gamesList.children);
                 let closestCard = null;
-                let minDiff                let closestCard = null;
                 let minDiff = Infinity;
-                const centerScroll = games = Infinity;
                 const centerScroll = gamesList.scrollTop + (gamesList.clientHeight / 2);
 
-List.scrollTop + (gamesList.clientHeight / 2);
-
                 cards.forEach(card => {
-                    const cardCenter =                cards.forEach(card => {
                     const cardCenter = card.offsetTop + (card.offsetHeight / 2);
-                    card.offsetTop + (card.offsetHeight / 2);
                     const diff = Math.abs(centerScroll - cardCenter);
- const diff = Math.abs(centerScroll - cardCenter);
                     if (diff < minDiff) {
-                        min                    if (diff < minDiff) {
                         minDiff = diff;
-                        closestCard = card;
-Diff = diff;
                         closestCard = card;
                     }
                 });
 
-                if (closestCard)                    }
-                });
-
                 if (closestCard) {
-                    const targetScroll = closestCard.offsetTop {
-                    const targetScroll = closestCard.offsetTop + (closestCard.offsetHeight / 2) - ( + (closestCard.offsetHeight / 2) - (gamesList.clientHeight / 2);
-                    gamesList.scrollTopgamesList.clientHeight / 2);
+                    const targetScroll = closestCard.offsetTop + (closestCard.offsetHeight / 2) - (gamesList.clientHeight / 2);
                     gamesList.scrollTop = targetScroll;
-                }
-            }, 1 = targetScroll;
                 }
             }, 10);
         }
 
-        function startAutoSwitch()0);
-        }
-
         function startAutoSwitch() {
-            if (autoSwitchInterval) clearInterval(autoSwitch {
             if (autoSwitchInterval) clearInterval(autoSwitchInterval);
-            autoSwitchInterval = setInterval(() => {Interval);
             autoSwitchInterval = setInterval(() => {
-                if (currentIndex === 1 && !isSlider
-                if (currentIndex === 1 && !isSliderDragging) { // Только если на вкладке ИDragging) { // Только если на вкладке Играть и не трогают руками
-                    // Сграть и не трогают руками
+                if (currentIndex === 1 && !isSliderDragging) { // Только если на вкладке Играть и не трогают руками
                     // Скроллим вниз к следующему
-                    gamesList.styleкроллим вниз к следующему
                     gamesList.style.scrollBehavior = 'smooth';
-                    gamesList.scrollTop.scrollBehavior = 'smooth';
-                    gamesList.scrollTop += (gamesList.children[0].offsetHeight += (gamesList.children[0].offsetHeight + 20);
+                    gamesList.scrollTop += (gamesList.children[0].offsetHeight + 20);
                     
-                    // + 20);
-                    
-                    // Проверка на конец списка для "бесконеч Проверка на конец списка для "бесконечности" (упрощенная)
-                    //ности" (упрощенная)
-                    // В реальном проекте здесь лучше перестав В реальном проекте здесь лучше переставлять DOM элементы, но для 3 элементовлять DOM элементы, но для 3 элементов достаточно скролла
-                    setTimeout(() => { достаточно скролла
+                    // Проверка на конец списка для "бесконечности" (упрощенная)
+                    // В реальном проекте здесь лучше переставлять DOM элементы, но для 3 элементов достаточно скролла
                     setTimeout(() => {
                          updateSliderState(true);
-                    }, 
-                         updateSliderState(true);
                     }, 400);
-                }
-            }, 400);
                 }
             }, 15000);
         }
 
-       15000);
-        }
-
         // Запуск после загрузки
-        setTimeout(initGamesSlider, // Запуск после загрузки
         setTimeout(initGamesSlider, 2200);
 
     </script>
- 2200);
-
-    </script>
 </body>
-</html>
-```</body>
 </html>
