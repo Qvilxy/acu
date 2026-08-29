@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>BCB Casino</title>
+    
     <!-- Подключаем скрипт Telegram Web Apps -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
@@ -313,15 +314,23 @@
     </nav>
 
     <script>
-        // --- Инициализация Telegram WebApp ---
-        const tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
-        tg.setHeaderColor('#4a0e2d');
-        tg.setBackgroundColor('#4a0e2d');
+        // --- БЕЗОПАСНАЯ ИНИЦИАЛИЗАЦИЯ TELEGRAM WEBAPP ---
+        // Проверяем, существует ли объект Telegram, чтобы избежать ошибок вне Telegram
+        const tg = window.Telegram?.WebApp || null;
+        
+        if (tg) {
+            try {
+                tg.ready();
+                tg.expand();
+                tg.setHeaderColor('#4a0e2d');
+                tg.setBackgroundColor('#4a0e2d');
+            } catch (e) {
+                console.warn('Telegram WebApp initialization error:', e);
+            }
+        }
 
-        // --- Данные пользователя ---
-        const user = tg.initDataUnsafe.user || {};
+        // --- ДАННЫЕ ПОЛЬЗОВАТЕЛЯ (Безопасная проверка) ---
+        const user = tg?.initDataUnsafe?.user || {};
         const avatarImg = document.getElementById('profile-avatar');
         const nameDiv = document.getElementById('profile-name');
         const usernameDiv = document.getElementById('profile-username');
@@ -329,19 +338,39 @@
         if (user.photo_url) {
             avatarImg.src = user.photo_url;
         } else {
-            avatarImg.src = 'https://via.placeholder.com/150/ffffff/4a0e2d?text=User';
+            // Заглушка, если нет фото или мы не в Telegram
+            avatarImg.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjIpIj48cGF0aCBkPSJNMTIgMTJjMi4yMSAwIDQtMS43OSA0LTRzLTEuNzktNC00LTRzLTQgMS43OS00IDRTOS43OSAxMiAxMiAxMnogTTEyIDE0Yy0yLjY3IDAtOCAxLjM0LTggNHYyaDE2di0yQzIwIDE1LjM0IDE0LjY3IDE0IDEyIDE0eiIvPjwvc3ZnPg==';
         }
+        
         nameDiv.textContent = user.first_name + (user.last_name ? ' ' + user.last_name : '') || 'Игрок BCB';
         usernameDiv.textContent = user.username ? '@' + user.username : 'Нет юзернейма';
 
-        // --- Логика загрузки ---
+        // --- НАДЕЖНАЯ ЛОГИКА ЗАГРУЗКИ ---
+        // Используем DOMContentLoaded вместо load, чтобы не ждать картинки
+        // И ставим жесткий таймаут на случай проблем
         const loadingScreen = document.getElementById('loading-screen');
-        window.addEventListener('load', () => {
+        let appStarted = false;
+
+        function startApp() {
+            if (appStarted) return;
+            appStarted = true;
+            
             setTimeout(() => {
                 loadingScreen.classList.add('hidden');
-                setTimeout(() => { loadingScreen.style.display = 'none'; }, 600);
-            }, 2000);
-        });
+                setTimeout(() => { 
+                    loadingScreen.style.display = 'none'; 
+                    // Инициализируем позицию плитки только после того, как экран загрузки исчез
+                    initMenuPosition();
+                }, 600);
+            }, 1500); // Уменьшил время до 1.5 сек для быстроты
+        }
+
+        // Запускаем сразу, как только DOM готов (не ждем картинки!)
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', startApp);
+        } else {
+            startApp();
+        }
 
         // --- ФИЗИКА МЕНЮ И DRAG-AND-DROP ---
         const navBar = document.getElementById('nav-bar');
@@ -372,7 +401,38 @@
             }
             
             // Используем CSS переменную для комбинирования translate и scale
-            pill.style.setProperty('--drag-transform', `translateX(<LaTex>id_1</LaTex>{xPos}px) <LaTex>id_2</LaTex>{newX}px)`);
+            pill.style.setProperty('--drag-transform', `translateX(${xPos}px)`);
+            pill.style.transform = `translateX(${xPos}px) ${!animate && isDragging ? 'scale(1.1)' : 'scale(1)'}`;
+            
+            currentTranslateX = xPos;
+        }
+
+        // Отдельная функция инициализации позиции (вызывается после загрузки)
+        function initMenuPosition() {
+            updatePillPosition(currentIndex, false);
+        }
+
+        // Обработчики Drag-and-Drop
+        const startDrag = (clientX) => {
+            isDragging = true;
+            startX = clientX - currentTranslateX;
+            pill.classList.add('dragging');
+            if(tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
+        };
+
+        const moveDrag = (clientX) => {
+            if (!isDragging) return;
+            
+            let newX = clientX - startX;
+            const step = getStepWidth();
+            const maxIndex = 2;
+            
+            // Ограничители с небольшим "выходом" за края
+            const limit = step * 0.4; 
+            if (newX < -limit) newX = -limit + (newX + limit) * 0.2; // Сопротивление на краях
+            if (newX > (maxIndex * step) + limit) newX = (maxIndex * step) + limit + (newX - ((maxIndex * step) + limit)) * 0.2;
+
+            pill.style.setProperty('--drag-transform', `translateX(${newX}px)`);
             pill.style.transform = `translateX(${newX}px) scale(1.1)`;
             currentTranslateX = newX;
         };
@@ -395,7 +455,7 @@
 
             // Примагничивание с физикой (пружина задана в CSS cubic-bezier)
             updatePillPosition(newIndex, true);
-            tg.HapticFeedback.impactOccurred('light');
+            if(tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         };
 
         // Переключение вкладок
@@ -411,3 +471,34 @@
         }
 
         // Привязка событий Touch
+        navBar.addEventListener('touchstart', (e) => startDrag(e.touches[0].clientX), {passive: false});
+        window.addEventListener('touchmove', (e) => {
+            if(isDragging) e.preventDefault(); 
+            moveDrag(e.touches[0].clientX);
+        }, {passive: false});
+        window.addEventListener('touchend', endDrag);
+
+        // Привязка событий Mouse (для ПК)
+        navBar.addEventListener('mousedown', (e) => startDrag(e.clientX));
+        window.addEventListener('mousemove', (e) => moveDrag(e.clientX));
+        window.addEventListener('mouseup', endDrag);
+
+        // Клик по вкладке
+        navItems.forEach((item, index) => {
+            item.addEventListener('click', () => {
+                if (!isDragging && index !== currentIndex) {
+                    switchTab(index);
+                    updatePillPosition(index, true);
+                    if(tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+                }
+            });
+        });
+
+        // Пересчет при ресайзе
+        window.addEventListener('resize', () => {
+            updatePillPosition(currentIndex, false);
+        });
+
+    </script>
+</body>
+</html>
