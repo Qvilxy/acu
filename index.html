@@ -60,14 +60,11 @@
 
         /* --- ШАПКА ПРИЛОЖЕНИЯ --- */
         header {
-            /* Фиксированная высота 120px + отступ под челку iPhone */
             height: 120px; 
             padding-top: env(safe-area-inset-top, 20px); 
-            
             display: flex;
             justify-content: center;
             align-items: center;
-            
             background: transparent; 
             flex-shrink: 0;
             z-index: 10;
@@ -75,7 +72,6 @@
         }
 
         .header-logo {
-            /* Размер логотипа адаптируется под высоту шапки */
             max-height: 80px; 
             width: auto;
             max-width: 90%;
@@ -108,24 +104,30 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* Вкладка "В разработке" - центрирование по центру экрана */
         .dev-placeholder {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100%;
+            height: 100vh; /* Занимает всю высоту видимой области */
             color: rgba(255, 255, 255, 0.4);
             font-size: 1.2em;
             font-weight: 500;
+            position: absolute; /* Чтобы не зависеть от паддингов main */
+            top: 0;
+            left: 0;
+            width: 100%;
         }
 
+        /* Стили для вкладки "Профиль" */
         .profile-container {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100%;
-            gap: 12px;
+            gap: 6px; /* Сокращено в 2 раза (было 12px) */
         }
 
         .user-avatar {
@@ -135,20 +137,23 @@
             border: 4px solid rgba(255, 255, 255, 0.15);
             object-fit: cover;
             background-color: rgba(0, 0, 0, 0.2);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            /* Тень убрана */
+            box-shadow: none; 
         }
 
         .user-name {
             font-size: 1.6em;
             font-weight: 700;
             letter-spacing: 0.5px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            /* Тень текста убрана */
+            text-shadow: none; 
         }
 
         .user-username {
             font-size: 1.1em;
             color: rgba(255, 255, 255, 0.6);
             font-weight: 500;
+            margin-top: 1px; /* Расстояние 1 пиксель */
         }
 
         /* --- ПАРЯЩЕЕ МЕНЮ --- */
@@ -173,7 +178,6 @@
             z-index: 1000;
             overflow: hidden;
             
-            /* Отключаем системные жесты браузера в зоне меню */
             touch-action: none; 
             -webkit-touch-callout: none;
         }
@@ -231,21 +235,22 @@
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 2px solid transparent; 
             
-            /* Тень только для объема самой плитки, без цветного свечения */
+            /* Используем outline вместо border для стабильности при движении */
+            outline: 2px solid transparent;
+            outline-offset: -2px;
+            
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             
-            /* Оптимизация для GPU */
             will-change: transform;
             
             /* Используем CSS переменные для позиции и масштаба */
             transform: translateX(var(--tx, 0px)) scale(var(--scale, 1));
             
-            /* Плавность только для цвета и тени, НЕ для transform во время драга */
+            /* Плавность только для цвета и тени */
             transition: 
                 background 0.3s ease,
-                border-color 0.3s ease, 
+                outline-color 0.3s ease, 
                 box-shadow 0.3s ease; 
         }
 
@@ -254,20 +259,29 @@
         .glass-pill.animating {
             background: rgba(255, 255, 255, 0.25);
             
-            /* Радужная рамка (Мыльный пузырь) - БЕЗ СВЕЧЕНИЯ ВОКРУГ */
-            border: 2px solid transparent;
+            /* Радужная обводка через outline и mask (не дергается!) */
+            outline: 2px solid transparent;
+            -webkit-mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            padding: 2px; /* Отступ для маски */
+            
+            /* Градиент применяется к фону, который просвечивает через маску в области outline */
             background-image: 
-                linear-gradient(#2a0a1a, #2a0a1a), /* Цвет фона внутри рамки */
+                linear-gradient(#2a0a1a, #2a0a1a), 
                 conic-gradient(from 0deg, #ff00cc, #3333ff, #00ffcc, #ffff00, #ff00cc);
             background-origin: border-box;
             background-clip: padding-box, border-box;
             
-            /* Убраны box-shadow, чтобы не было ореола */
+            /* Свечение убрано */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         /* Специфика перетаскивания: ПОЛНОСТЬЮ отключаем transition для transform */
         .glass-pill.dragging {
-            /* Никаких transition здесь! Это убирает дергание */
+            /* Никаких transition здесь! */
         }
 
     </style>
@@ -402,15 +416,13 @@
                 pill.classList.remove('animating');
             } else if (!animate) {
                 pill.classList.remove('dragging', 'animating');
-                // При инициализации transition не нужен
                 pill.style.transition = 'none';
             } else {
-                // Анимация полета (snap)
                 pill.classList.remove('dragging');
                 pill.classList.add('animating');
                 
                 // Включаем плавную пружинистую анимацию ТОЛЬКО для transform
-                pill.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease';
+                pill.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s ease, outline-color 0.3s ease, box-shadow 0.3s ease';
                 
                 // Убираем эффект радуги после завершения полета
                 setTimeout(() => {
