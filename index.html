@@ -104,17 +104,20 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Вкладка "В разработке" - идеальное центрирование */
+        /* Вкладка "В разработке" - идеальное центрирование по экрану */
         .dev-placeholder {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100dvh; /* Используем динамическую высоту вьюпорта */
+            height: 100dvh; /* Полная высота видимого экрана */
             color: rgba(255, 255, 255, 0.4);
             font-size: 1.2em;
             font-weight: 500;
             width: 100%;
+            position: absolute; /* Чтобы не зависеть от скролла */
+            top: 0;
+            left: 0;
         }
 
         /* Стили для вкладки "Профиль" */
@@ -135,6 +138,14 @@
             object-fit: cover;
             background-color: rgba(0, 0, 0, 0.2);
             box-shadow: none; 
+            margin-bottom: 10px;
+        }
+
+        .user-name-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px; /* Расстояние между именем и зеленой линией */
         }
 
         .user-name {
@@ -144,11 +155,20 @@
             text-shadow: none; 
         }
 
+        /* Зеленая полоска под именем */
+        .green-line {
+            width: 100%;
+            height: 2px;
+            background-color: #4ade80; /* Яркий зеленый цвет */
+            border-radius: 2px;
+            box-shadow: 0 0 8px rgba(74, 222, 128, 0.6); /* Легкое свечение */
+        }
+
         .user-username {
             font-size: 1.1em;
             color: rgba(255, 255, 255, 0.6);
             font-weight: 500;
-            margin-top: 3px;
+            margin-top: 4px; /* Расстояние от зеленой линии до юзернейма */
         }
 
         /* --- ПАРЯЩЕЕ МЕНЮ --- */
@@ -223,7 +243,7 @@
             animation: spinGear 0.6s ease-in-out;
         }
         
-        /* Новая анимация нажатия на консоль */
+        /* Анимация нажатия на консоль */
         .nav-item.active-text svg.icon-gamepad {
             animation: pressGamepad 0.4s ease-in-out;
         }
@@ -237,7 +257,7 @@
             to { transform: rotate(180deg); }
         }
 
-        /* Эффект нажатия кнопок геймпада (сжатие справа/слева) */
+        /* Эффект нажатия кнопок геймпада */
         @keyframes pressGamepad {
             0% { transform: scaleX(1) scaleY(1); }
             25% { transform: scaleX(0.85) scaleY(1.1) translateX(2px); } /* Нажатие правой части */
@@ -322,7 +342,13 @@
         <div id="tab-profile" class="tab-content">
             <div class="profile-container">
                 <img id="profile-avatar" src="" alt="Avatar" class="user-avatar">
-                <div id="profile-name" class="user-name">Загрузка...</div>
+                
+                <div class="user-name-wrapper">
+                    <div id="profile-name" class="user-name">Загрузка...</div>
+                    <!-- Зеленая полоска -->
+                    <div class="green-line"></div>
+                </div>
+                
                 <div id="profile-username" class="user-username">@...</div>
             </div>
         </div>
