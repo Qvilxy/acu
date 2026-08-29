@@ -104,19 +104,260 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Вкладка "В разработке" - центрирование по центру экрана */
+        /* Вкладка "В разработке" - идеальное центрирование */
         .dev-placeholder {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            height: 100dvh; /* Используем динамическую высоту вьюпорта */
             color: rgba(255, 255, 255, 0.4);
             font-size: 1.2em;
             font-weight: 500;
-            position: absolute;
+            width: 100%;
+        }
+
+        /* Стили для вкладки "Профиль" */
+        .profile-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            gap: 6px;
+        }Вот исправленный и доработанный код.
+
+**Что исправлено:**
+1.  **Центрирование индикатора на вкладке "Профиль":** Проблема возникала из-за того, что `calc((100% - 12px) / 3)` в CSS иногда давал погрешность в пикселях при рендеринге на разных
+
+        .user-avatar {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, 0.15);
+            object-fit: cover;
+            background-color: rgba(0, 0, экранах. Я переписал логику позиционирования 0, 0.2);
+            box-shadow: none; 
+        }
+
+        .user-name {
+            font-size: 1.6em;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-shadow: none; 
+        }
+
+        .user-username {
+            font-size: 1.1em;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+            margin-top: 3px;
+        }
+
+        /* --- ПАРЯЩЕЕ МЕНЮ --- */
+        nav {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 92%;
+            max-width: 420px;
+: теперь JS вычисляет точную ширину одной секции и задает её индикатору напрямую через переменную `--pill-width`. Это гарантирует идеальное центрирование на любой вкладке.
+2.  **Анимация геймпада:** Добавлена анимация `pressGamepad`. Иконка сжимается справа и расширяется слева (и наоборот), имитируя нажатие на кнопки консоли.
+3.  **Центрирование текста "В разработке":** Убраны лишние отступы и абсолютное позиционирование, которое конфликтовало с прокруткой. Теперь текст центрируется относительно видимой области экрана (`100dvh`) с помощью Flexbox.
+
+Сохраните этот код как `index.html`.
+
+```html
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>BCB Casino</title>
+    
+    <!-- Подключаем скрипт Telegram Web Apps -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <style>
+        /* --- Базовые стили --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0            height: 70px;
+            
+            background: #3a0b22; 
+            border-radius: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px;
+            z-index: 1000;
+            overflow: hidden;
+            
+            touch-action: none; 
+            -webkit-touch-callout: none;
+        }
+
+        .nav-track {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            z-index: 2;
+        }
+
+        .nav-item {
+            flex:;
+            -webkit-tap-highlight-color: transparent; 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #8E8E93;
+            transition: color 0.3s;
+            position: relative;
+            z-index: 2;
+        }
+
+        .nav-item svg {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+            fill: currentColor;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-origin: center;
+        }
+
+        .nav-item span {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .nav-item.active-text {
+            color: #F2F2F7;
+        }
+
+        /* А
+            user-select: none;
+            -webkit-userнимации иконок при активации */
+        .nav-item.active-text svg.icon-gear {
+            animation: spinGear 0.6s ease-in-out;
+        }
+        
+        /* Новая анимация нажатия на консоль */
+       -select: none;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #4a0e2d, #7b1f4c);
+            color: white;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Экран загрузки --- */
+        #loading-screen {
+            position: fixed;
             top: 0;
             left: 0;
+            width: 100%;
+            height: 100%; .nav-item.active-text svg.icon-gamepad {
+            animation: pressGamepad 0.4s ease-in-out;
+        }
+        
+        .nav-item.active-text svg.icon-profile {
+            animation: pulseProfile 0.4s ease-in-out;
+        }
+
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            background: linear-gradient(135deg, #4a0e2d, #7b1f4c);
+            transition: opacity 0.6s ease-out, visibility 0.6s;
+        }
+
+        #loading-screen.loaded {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loading-logo {
+            width: 50%;
+            max-width: 250px;
+            height: auto;
+            object-fit: contain;
+        }
+
+        /* --- ШАПКА ПРИЛОЖЕНИЯ --- */
+        header {
+            height: 120px; 
+            padding-top: env(safe-area-inset-top, 20px); 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: transparent; 
+            flex-shrink: 0;
+            z-index: 10;
+            width: 100%;
+        }
+
+        .header-logo {
+            max-height: 80px; 
+            width: auto;
+            max-width: 90%;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+        }
+
+        /* --- Основной контент --- */
+        main {
+            flex-grow: 1;
+            position: relative;
+            overflow-y: auto;
+            padding-bottom: 120px; 
+            width: 100%;
+        }
+
+        .tab-content {
+            display: none;
+            width: 100%;
+            min-height: 100%;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Вкладка "В разработке" - идеальное центрирование */
+        .dev-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100dvh; /* Используем динамическую высоту вьюпорта */
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 1.2em;
+            font-weight: 500;
             width: 100%;
         }
 
@@ -151,15 +392,59 @@
             font-size: 1.1em;
             color: rgba(255, 255, 255, 0.6);
             font-weight: 500;
-            margin-top: 3px; /* Уменьшено расстояние */
+        @keyframes spinGear {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(180deg); }
         }
 
-        /* --- ПАРЯЩЕЕ МЕНЮ --- */
+        /* Эффект нажатия кнопок геймпада (сжатие справа/слева) */
+        @keyframes pressGamepad {
+            0% { transform: scaleX(1) scaleY(1); }
+            25% { transform: scaleX(0.85) scaleY(1.1) translate            margin-top: 3px;
+        }
+
+X(2px); } /* Нажатие правой части */
+            50% { transform: scaleX(1) scaleY(1); }
+            75% { transform: scaleX        /* --- ПАРЯЩЕЕ МЕНЮ --- */
         nav {
             position: fixed;
             bottom: 25px;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translateX(-(0.85) scaleY(1.1) translateX(-2px); } /* Нажатие левой части */
+            100% { transform: scaleX(1) scaleY(1); }
+        }
+
+        @keyframes pulseProfile {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* --- ИНДИКАТОР (ПЛИТКА) --- */
+        .glass-pill {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            /* Ширина задается через JS переменную для идеальной точности */
+            width: var(--pill-width, calc((100% - 12px) / 3)); 
+            height: calc(100% - 12px);
+            border-radius: 32px;
+            z-index: 1;
+            
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            
+            will-change: transform;
+            
+            transform: translateX(var(--tx, 0px)) scale(var(--scale, 1));
+            
+            transition: 
+                background 0.3s ease,
+                border-color 0.3s ease50%);
             width: 92%;
             max-width: 420px;
             height: 70px;
@@ -208,6 +493,7 @@
             margin-bottom: 4px;
             fill: currentColor;
             transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-origin: center;
         }
 
         .nav-item span {
@@ -225,8 +511,9 @@
             animation: spinGear 0.6s ease-in-out;
         }
         
+        /* Новая анимация нажатия на консоль */
         .nav-item.active-text svg.icon-gamepad {
-            animation: bounceGamepad 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: pressGamepad 0.4s ease-in-out;
         }
         
         .nav-item.active-text svg.icon-profile {
@@ -238,59 +525,102 @@
             to { transform: rotate(180deg); }
         }
 
-        @keyframes bounceGamepad {
-            0% { transform: translateY(0); }
-            50% { transform: translateY(-6px) scale(1.1); }
-            100% { transform: translateY(0); }
+        /* Эффект нажатия кнопок геймпада (сжатие справа/слева) */
+        @keyframes pressGamepad {
+            0% { transform: scaleX(1) scaleY(1); }
+            25% { transform: scaleX(0.85) scaleY(1.1) translateX(2px); } /* Нажатие правой части */
+            50% { transform: scaleX(1) scaleY(1); }
+            75% { transform: scaleX(0.85) scaleY(1.1) translateX(-2px); } /* Нажатие левой части */
+            100% { transform: scaleX(1) scaleY(1); }
         }
 
         @keyframes pulseProfile {
             0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-
-        /* --- ИНДИКАТОР (ПЛИТКА) --- */
-        .glass-pill {
-            position: absolute;
-            top: 6px;
-            left: 6px;
-            /* Идеальная ширина для 3 вкладок с учетом паддингов 6px */
-            width: calc((100% - 12px) / 3); 
-            height: calc(100% - 12px);
-            border-radius: 32px;
-            z-index: 1;
-            
-            /* Простой фон без радуги */
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            
-            /* Тонкая белая рамка для четкости */
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            
-            will-change: transform;
-            
-            /* Используем CSS переменную для позиции. Scale управляется отдельно */
-            transform: translateX(var(--tx, 0px)) scale(var(--scale, 1));
-            
-            /* Плавность только для цвета и тени, НЕ для transform во время драга */
-            transition: 
-                background 0.3s ease,
-                border-color 0.3s ease, 
+            50% { transform: scale(1.2);, 
                 box-shadow 0.3s ease; 
         }
 
-        /* При перетаскивании или анимации полета делаем чуть ярче */
         .glass-pill.dragging,
         .glass-pill.animating {
             background: rgba(255, 255, 255, 0.25);
             border-color: rgba(255, 255, 255, 0.3);
         }
 
-        /* Специфика перетаскивания: ПОЛНОСТЬЮ отключаем transition для transform */
+        .glass-pill.dragging {
+            transition: none !important;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Экран загрузки -->
+    <div id="loading-screen }
+            100% { transform: scale(1); }
+        }
+
+        /* --- ИН">
+        <img src="bcblogo.PNG" alt="BCB Logo" class="loading-logo" onerror="this.style.display='none'">
+    </div>
+
+    <!-- Шапка -->
+    <header>
+        <img src="bcblogotext.PNG" alt="BCB Text Logo" class="header-logo" onerror="this.style.display='none'">ДИКАТОР (ПЛИТКА) --- */
+    </header>
+
+    <!-- Контент -->
+        .glass-pill {
+            position: absolute;
+            top: 6px;
+            left:
+    <main>
+        <!-- Вкладка 1: В разработке -->
+        <div id="tab-dev" class="tab-content">
+            <div class="dev-placeholder">
+                <p>Раздел в разработке 6px;
+            /* Ширина задается через JS</p>
+            </div>
+        </div переменную для идеальной точности */
+            width: var(--pill-width, calc((10>
+
+        <!-- Вкладка 2: Играть0% - 12px) / 3)); (Активна по умолчанию) -->
+        <div 
+            height: calc(100% - 12px);
+            border-radius: 32px;
+            z-index: 1;
+            
+ id="tab-play" class="tab-content active">
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 15px            <!-- Пустой фон -->
+        </div> rgba(0, 0, 0, 0.2);
+            
+            will-change: transform;
+            
+            transform: translateX(var(--tx, 
+
+        <!-- Вкладка 3: Профиль -->
+0px)) scale(var(--scale, 1));
+            
+            transition: 
+                background 0.3s        <div id="tab-profile" class="tab-content ease,
+                border-color 0.3s ease">
+            <div class="profile-container">
+               , 
+                box-shadow 0.3s ease; <img id="profile-avatar" src="" alt="Avatar 
+        }
+
+        .glass-pill.dragging,
+        .glass-pill.animating {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255" class="user-avatar">
+                <div id="profile-name" class="user-name">Загрузка...</div>
+                <div id="profile-username" class, 255, 0.3);
+        }
+
         .glass-pill.dragging {
             transition: none !important;
         }
@@ -329,221 +659,446 @@
                 <img id="profile-avatar" src="" alt="Avatar" class="user-avatar">
                 <div id="profile-name" class="user-name">Загрузка...</div>
                 <div id="profile-username" class="user-username">@...</div>
+            </div="user-username">@...</div>
             </div>
         </div>
     </main>
 
+>
+        </div>
+    </main>
+
     <!-- Меню навигации -->
+    <nav    <!-- Меню навигации -->
     <nav id="nav-bar">
+        <!-- Плавающая плитка --> id="nav-bar">
         <!-- Плавающая плитка -->
+        <div class="glass-pill" id="active
         <div class="glass-pill" id="active-pill"></div>
+
+        <!-- Трек с кнопками-pill"></div>
 
         <!-- Трек с кнопками -->
         <div class="nav-track">
-            <div class="nav-item" data-target="tab-dev" data-index="0">
-                <svg class="icon-gear" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.49-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+            -->
+        <div class="nav-track">
+            <div class="nav-item" data-target="tab-dev <div class="nav-item" data-target="tab-dev" data-index="0">
+                <svg class="" data-index="0">
+                <svg class="icon-gear" viewBox="0 0 24icon-gear" viewBox="0 0 24 24"><path d="M19.1 24"><path d="M19.14 12.94c.04-.4 12.94c.04-.3.06-.61.06-.93.06-.61.06-.94 0-.32-.02-.644 0-.32-.02-.64-.07-.94l2.03--.07-.94l2.03-1.58c.18-.14.1.58c.18-.14.23-.41.12-.61l23-.41.12-.61l-1.92-3.32c-.-1.92-3.32c-.12-.22-.37-.29-.12-.22-.37-.29-.59-.22l-2.39.59-.22l-2.39.96c-.5-.38-1.096c-.5-.38-1.03-.7-1.62-.94l3-.7-1.62-.94l-.36-2.54c-.04-.36-2.54c-.04-.24-.24-.41-.48-.24-.24-.41-.48-.41h-3.84c-.2-.41h-3.84c-.24 0-.43.17-.474 0-.43.17-.47.41l-.36 2.54.41l-.36 2.54c-.59.24-1.13c-.59.24-1.13.56-1.62.94l.56-1.62.94l-2.39-.96c-.22-2.39-.96c-.22-.08-.47 0-.59.-.08-.47 0-.59.22L2.74 8.8722L2.74 8.87c-.12.21-.08.4c-.12.21-.08.47.12.61l2.037.12.61l2.03 1.58c-.05.3-. 1.58c-.05.3-.09.63-.09.94s09.63-.09.94s.02.64.07.94.02.64.07.94l-2.03 1.58cl-2.03 1.58c-.18.14-.23.41-.18.14-.23.41-.12.61l1.92 -.12.61l1.92 3.32c.12.22.3.32c.12.22.37.29.59.22l37.29.59.22l2.39-.96c.5.32.39-.96c.5.38 1.03.7 1.68 1.03.7 1.62.94l.36 2.52.94l.36 2.54c.05.24.24.4c.05.24.24.41.48.41h3.841.48.41h3.84c.24 0 .44-.14c.24 0 .44-.17.47-.41l.36-7.47-.41l.36-2.54c.59-.24 2.54c.59-.24 1.13-.56 1.621.13-.56 1.62-.94l2.39.96c-.94l2.39.96c.22.08.47 0 ..22.08.47 0 .59-.22l1.92-359-.22l1.92-3.32c.12-.22.0.32c.12-.22.07-.49-.12-.61l-7-.49-.12-.61l-2.01-1.58zM122.01-1.58zM12 15.6c-1.98  15.6c-1.98 0-3.6-1.62-30-3.6-1.62-3.6-3.6s1.62-.6-3.6s1.62-3.6 3.6-3.6 3.6 3.6-3.6 3.6 1.62 3.63.6 1.62 3.6 3.6-1.62 3. 3.6-1.62 3.6-3.6 3.6z"/></svg6-3.6 3.6z"/></svg>
+                <span>В разработке</span>
+>
                 <span>В разработке</span>
             </div>
             
-            <div class="nav-item active-text" data-target="tab-play" data-index="1">
-                <svg class="icon-gamepad" viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+            <div class="nav            </div>
+            
+            <div class="nav-item active-text" data-target="tab-play" data-index-item active-text" data-target="tab-play" data-index="1">
+                <svg class="icon-gamepad="1">
+                <svg class="icon-gamepad" viewBox="0 0 24 24" viewBox="0 0 24 24"><path d="M21 6H3c"><path d="M21 6H3c-1.1 0-2 .9-2-1.1 0-2 .9-2 2v8c0 1.1.9 2v8c0 1.1.9 2 2 2h18c1. 2 2 2h18c1.1 0 2-.9 2-2V1 0 2-.9 2-2V8c0-1.1-.9-2-8c0-1.1-.9-2-2-2zm-10 7H8v2-2zm-10 7H8v3H6v-3H3v-2h3H6v-3H3v-2h3V8h2v3h3v2zm3V8h2v3h3v2zm4.5 2c-.83 0-4.5 2c-.83 0-1.5-.67-1.5-11.5-.67-1.5-1.5s.67-1.5 1.5s.67-1.5 1.5-1.5 1.5.6.5-1.5 1.5.67 1.5 1.5-.677 1.5 1.5-.67 1.5-1.5 1.5 1.5-1.5 1.5zm4-3c-.83 0-1zm4-3c-.83 0-1.5-.67-1.5-1..5-.67-1.5-1.5S18.67 9 195S18.67 9 19.5 9s1.5.67 .5 9s1.5.67 1.5 1.5-.67 11.5 1.5-.67 1.5-1.5 1.5z"/>.5-1.5 1.5z"/></svg>
+                <span>Играть</span</svg>
                 <span>Играть</span>
             </div>
             
-            <div class="nav-item" data-target="tab-profile" data-index="2">
-                <svg class="icon-profile" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            <div class>
+            </div>
+            
+            <div class="nav-item" data-target="tab-profile" data-index="nav-item" data-target="tab-profile" data-index="2">
+                <svg class="icon-profile"="2">
+                <svg class="icon-profile" viewBox="0 0 24 24"> viewBox="0 0 24 24"><path d="M12 12c2.<path d="M12 12c2.21 0 4-1.79 21 0 4-1.79 4-4s-1.79-4-4-4s-1.79-4-4-4-4 1.79-44-4-4 1.79-4 4 1.79 4 4  4 1.79 4 4 4zm0 2c-2.67 4zm0 2c-2.67 0-8 1.34-8 40-8 1.34-8 4v2h16v-2c0-2v2h16v-2c0-2.66-5.33-4-8.66-5.33-4-8-4z"/></svg>
+                <span>Про-4z"/></svg>
                 <span>Профиль</span>
+            </div>
+        филь</span>
             </div>
         </div>
     </nav>
 
+    <script></div>
+    </nav>
+
     <script>
-        // --- 1. БЕЗОПАСНАЯ ИНИЦИАЛИЗАЦИЯ TELEGRAM WEBAPP ---
+        // --- 1. БЕЗОПАСНАЯ
+        // --- 1. БЕЗОПАСНАЯ ИНИЦИАЛИЗАЦИЯ TELEGRAM WEBAPP --- ИНИЦИАЛИЗАЦИЯ TELEGRAM WEBAPP ---
+        const tg = window.Telegram?.WebApp ||
         const tg = window.Telegram?.WebApp || null;
+        
+        if (tg) {
+            null;
         
         if (tg) {
             try {
                 tg.ready();
+                tg.expand(); try {
+                tg.ready();
                 tg.expand();
+                tg.setHeaderColor('#4a0e2d
                 tg.setHeaderColor('#4a0e2d');
                 tg.setBackgroundColor('#4a0e2d');
+                tg.setBackgroundColor('#4a0e2d');
+            } catch (e) {
+                console');
             } catch (e) {
                 console.warn('Telegram WebApp init error:', e);
+           .warn('Telegram WebApp init error:', e);
             }
         }
 
+        // --- 2. Д }
+        }
+
         // --- 2. ДАННЫЕ ПОЛЬЗОВАТЕЛЯ ---
+        constАННЫЕ ПОЛЬЗОВАТЕЛЯ ---
         const user = tg?.initDataUnsafe?.user || {};
+ user = tg?.initDataUnsafe?.user || {};
+        const avatarImg = document.getElementById('profile-avatar');
         const avatarImg = document.getElementById('profile-avatar');
         const nameDiv = document.getElementById('profile-name');
-        const usernameDiv = document.getElementById('profile-username');
+        const nameDiv = document.getElementById('profile-name');
+        const usernameDiv = document.getElementById('profile-username');        const usernameDiv = document.getElementById('profile-username');
+
+        if (user.photo_url) {
+            avatar
 
         if (user.photo_url) {
             avatarImg.src = user.photo_url;
+        } else {Img.src = user.photo_url;
         } else {
-            avatarImg.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjIpIj48cGF0aCBkPSJNMTIgMTJjMi4yMSAwIDQtMS43OSA0LTRzLTEuNzktNC00LTRzLTQgMS43OS00IDRTOS43OSAxMiAxMiAxMnogTTEyIDE0Yy0yLjY3IDAtOCAxLjM0LTggNHYyaDE2di0yQzIwIDE1LjM0IDE0LjY3IDE0IDEyIDE0eiIvPjwvc3ZnPg==';
+            avatarImg.src = 'data:image/svg+xml;base
+            avatarImg.src = 'data:image/svg+xml;base64,PHN2ZyB4bW64,PHN2ZyB4bWxucz0iaHR0cDovL3dxucz0iaHR0cDovL3d3dy53My5vcmcvMj3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCbAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAy3g9IjAgMCAyNCAyNCIgZmlsbD0icmdiYSgyNTNCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjUsMjU1LDI1NSwwLjIpIj48cGF0aCBkPSIpIj48cGF0aCBkPSJNMTIgMTJjMi4yJNMTIgMTJjMi4yMSAwIDQtMS43OSA0LTRMSAwIDQtMS43OSA0LTRzLTEuNzktNC00LTRzLTzLTEuNzktNC00LTRzLTQgMS43OS00IDRTOS43QgMS43OS00IDRTOS43OSAxMiAxMiAxMnogTTEOSAxMiAxMiAxMnogTTEyIDE0Yy0yLjY3IDyIDE0Yy0yLjY3IDAtOCAxLjM0LTggNHYyaAtOCAxLjM0LTggNHYyaDE2di0yQzIwIDE1DE2di0yQzIwIDE1LjM0IDE0LjY3IDELjM0IDE0LjY3IDE0IDEyIDE0eiIvPjwvc0IDEyIDE0eiIvPjwvc3ZnPg==';
         }
         
-        nameDiv.textContent = user.first_name + (user.last_name ? ' ' + user.last_name : '') || 'Игрок BCB';
-        usernameDiv.textContent = user.username ? '@' + user.username : 'Нет юзернейма';
+       3ZnPg==';
+        }
+        
+        nameDiv.textContent = user.first_name + (user.last_name nameDiv.textContent = user.first_name + (user.last_name ? ' ' + user.last_name : '') || 'И ? ' ' + user.last_name : '') || 'Игрок BCB';
+        usernameDiv.textContent = userгрок BCB';
+        usernameDiv.textContent = user.username ? '@' + user.username : 'Нет юзер.username ? '@' + user.username : 'Нет юзернейма';
+
+        // --- 3. ЛОнейма';
 
         // --- 3. ЛОГИКА ЗАГРУЗКИ ---
+        const loadingГИКА ЗАГРУЗКИ ---
         const loadingScreen = document.getElementById('loading-screen');
         
+        setTimeoutScreen = document.getElementById('loading-screen');
+        
         setTimeout(() => {
+            loadingScreen.classList.add('loaded');(() => {
             loadingScreen.classList.add('loaded');
             setTimeout(() => { 
+                if(loadingScreen
+            setTimeout(() => { 
                 if(loadingScreen) loadingScreen.remove(); 
+            }, 600) loadingScreen.remove(); 
             }, 600);
         }, 2000);
 
-        // --- 4. ФИЗИКА МЕНЮ И DRAG-AND-DROP ---
+       );
+        }, 2000);
+
+        // --- 4. ФИЗИКА МЕНЮ И // --- 4. ФИЗИКА МЕНЮ И DRAG-AND-DROP ---
+        const navBar DRAG-AND-DROP ---
         const navBar = document.getElementById('nav-bar');
+        const pill = = document.getElementById('nav-bar');
         const pill = document.getElementById('active-pill');
+        const navItems = document.getElementById('active-pill');
         const navItems = document.querySelectorAll('.nav-item');
+        const tabContents = document.querySelectorAll('.nav-item');
         const tabContents = document.querySelectorAll('.tab-content');
 
+        let currentIndex =  document.querySelectorAll('.tab-content');
+
         let currentIndex = 1; // Начинаем с "Играть"
+1; // Начинаем с "Играть"
         let isDragging = false;
+        let startX =        let isDragging = false;
         let startX = 0;
+        let currentTranslateX = 0 0;
         let currentTranslateX = 0; 
         
         function getStepWidth() { 
-            // Ширина трека минус паддинги (12px) деленная на 3
-            return navBar ? (navBar.offsetWidth - 12) / 3 : 100; 
+            //; 
+        
+        function getStepWidth() { 
+            // Вычисляем точную ширину одной секции
+ Вычисляем точную ширину одной секции
+            return navBar ? (navBar.offsetWidth - 1            return navBar ? (navBar.offsetWidth - 12) / 3 : 100; 
+2) / 3 : 100; 
         }
 
+        function updatePillPosition(index, animate        }
+
         function updatePillPosition(index, animate = true) {
+            if (!pill || !nav = true) {
             if (!pill || !navBar) return;
+            
+            const step = getStepBar) return;
             
             const step = getStepWidth();
             const xPos = index * step; 
             
+Width();
+            const xPos = index * step; 
+            
+            // Задаем точную ширину            // Задаем точную ширину плитки через переменную, чтобы она идеально совпадала плитки через переменную, чтобы она идеально совпадала с шириной секции
+            pill.style.setProperty('--pill с шириной секции
+            pill.style.setProperty('--pill-width', `${step}px`);
+            
+            // Управление-width', `${step}px`);
+            
             // Управление классами эффектов
+            if (isDragging) { классами эффектов
             if (isDragging) {
                 pill.classList.add('dragging');
+                pill
+                pill.classList.add('dragging');
                 pill.classList.remove('animating');
+            } else if (!.classList.remove('animating');
             } else if (!animate) {
+                pill.classList.remove('dragging',animate) {
                 pill.classList.remove('dragging', 'animating');
+                pill.style.transition = 'none 'animating');
                 pill.style.transition = 'none';
             } else {
+                pill.classList.remove('';
+            } else {
                 pill.classList.remove('dragging');
+                pill.classList.add('animating');dragging');
                 pill.classList.add('animating');
                 
+                // Пружинистая анимация
+                
                 // Пружинистая анимация при отпускании
-                pill.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease';
+                pill.style.transition = 'transform  при отпускании
+                pill.style.transition = 'transform 0.5s cubic-bezier(0.340.5s cubic-bezier(0.34, 1.56, 0.64, 1.56, 0.64, 1), background 0.3s ease,, 1), background 0.3s ease, border-color 0.3s ease, box-shadow  border-color 0.3s ease, box-shadow 0.3s ease';
+                
+                setTimeout(() =>0.3s ease';
                 
                 setTimeout(() => {
+                    if (!isDragging) pill.classList.remove(' {
                     if (!isDragging) pill.classList.remove('animating');
+                }, 500);
+animating');
                 }, 500);
             }
             
+            // Применяем позицию через CSS            }
+            
             // Применяем позицию через CSS переменную
+            pill.style.setProperty('--tx', `${x переменную
             pill.style.setProperty('--tx', `${xPos}px`);
+            pill.style.setProperty('--scale',Pos}px`);
             pill.style.setProperty('--scale', isDragging ? 1.1 : 1);
+ isDragging ? 1.1 : 1);
+            
+            currentTranslateX = xPos;
+        }
+
             
             currentTranslateX = xPos;
         }
 
         // Инициализация позиции меню
+        setTimeout(()        // Инициализация позиции меню
         setTimeout(() => {
+            updatePillPosition(currentIndex, false => {
             updatePillPosition(currentIndex, false);
+        }, 2100);
+
+       );
         }, 2100);
 
         const startDrag = (clientX) => {
             isDragging = true;
+            startX = clientX - const startDrag = (clientX) => {
+            isDragging = true;
             startX = clientX - currentTranslateX;
+            pill.classList.add('dragging currentTranslateX;
             pill.classList.add('dragging');
+            pill.style.setProperty('--scale', 1.');
             pill.style.setProperty('--scale', 1.1);
+            if(tg?.HapticFeedback)1);
             if(tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
         };
 
+        tg.HapticFeedback.selectionChanged();
+        };
+
         const moveDrag = (clientX) => {
+            const moveDrag = (clientX) => {
             if (!isDragging) return;
             
+            let newX if (!isDragging) return;
+            
             let newX = clientX - startX;
+            const step = get = clientX - startX;
             const step = getStepWidth();
+            const maxIndex = 2;StepWidth();
             const maxIndex = 2;
             
             // Эластичность на краях
+            
+            // Эластичность на краях
+            const limit = step * 0.4;
             const limit = step * 0.4; 
-            if (newX < -limit) newX = -limit + (newX + limit) * 0.2;
-            if (newX > (maxIndex * step) + limit) newX = (maxIndex * step) + limit + (newX - ((maxIndex * step) + limit)) * 0.2;
+            if (newX < -limit) newX = 
+            if (newX < -limit) newX = -limit + (newX + limit) * 0 -limit + (newX + limit) * 0.2;
+            if (newX > (max.2;
+            if (newX > (maxIndex * step) + limit) newX = (maxIndexIndex * step) + limit) newX = (maxIndex * step) + limit + (newX - ((max * step) + limit + (newX - ((maxIndex * step) + limit)) * 0.2Index * step) + limit)) * 0.2;
+
+            // Мгновенное обновление позиции без transition;
 
             // Мгновенное обновление позиции без transition
+            pill.style.setProperty('--tx', `${newX}px
             pill.style.setProperty('--tx', `${newX}px`);
+            currentTranslateX = newX;
+       `);
             currentTranslateX = newX;
         };
 
         const endDrag = () => {
+            };
+
+        const endDrag = () => {
             if (!isDragging) return;
+            isDragging = if (!isDragging) return;
             isDragging = false;
+            pill.classList.remove('dragging');
+ false;
             pill.classList.remove('dragging');
             
             const step = getStepWidth();
+            let            
+            const step = getStepWidth();
             let newIndex = Math.round(currentTranslateX / step);
             
-            if (newIndex < 0) newIndex = 0;
+ newIndex = Math.round(currentTranslateX / step);
+            
+            if (newIndex < 0) newIndex =             if (newIndex < 0) newIndex = 0;
+            if (newIndex > 2)0;
             if (newIndex > 2) newIndex = 2;
+
+            if (newIndex !== newIndex = 2;
 
             if (newIndex !== currentIndex) {
                 switchTab(newIndex);
+            currentIndex) {
+                switchTab(newIndex);
             }
+
+            updatePillPosition(newIndex, true); }
 
             updatePillPosition(newIndex, true);
             
+            if(tg?.HapticFeedback) tg
+            
             if(tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+        };.HapticFeedback.impactOccurred('light');
         };
+
+        function switchTab(newIndex) {
+            currentIndex
 
         function switchTab(newIndex) {
             currentIndex = newIndex;
             
+            navItems.forEach(item => item = newIndex;
+            
             navItems.forEach(item => item.classList.remove('active-text'));
+            navItems[currentIndex.classList.remove('active-text'));
             navItems[currentIndex].classList.add('active-text');
 
+            tabContents.forEach].classList.add('active-text');
+
             tabContents.forEach(tab => tab.classList.remove('active'));
-            const targetId = navItems[currentIndex].getAttribute('data-target');
+            const target(tab => tab.classList.remove('active'));
+            const targetId = navItems[currentIndex].getAttribute('data-target');Id = navItems[currentIndex].getAttribute('data-target');
+            if(targetId) {
+                const targetEl
             if(targetId) {
                 const targetEl = document.getElementById(targetId);
+                if(targetEl) = document.getElementById(targetId);
                 if(targetEl) targetEl.classList.add('active');
+            }
+        targetEl.classList.add('active');
             }
         }
 
         // Привязка событий Touch
+        if }
+
+        // Привязка событий Touch
         if(navBar) {
-            navBar.addEventListener('touchstart', (e) => startDrag(e.touches[0].clientX), {passive: false});
+            navBar.addEventListener('touchstart(navBar) {
+            navBar.addEventListener('touchstart', (e) => startDrag(e.touches[0].', (e) => startDrag(e.touches[0].clientX), {passive: false});
+        }clientX), {passive: false});
         }
+        window.addEventListener('touchmove', (e) =>
         window.addEventListener('touchmove', (e) => {
             if(isDragging) {
+                e.preventDefault {
+            if(isDragging) {
                 e.preventDefault(); 
+                moveDrag(e.touches[0].clientX(); 
                 moveDrag(e.touches[0].clientX);
             }
+        }, {passive: false);
+            }
         }, {passive: false});
+        window.addEventListener('touchend', endDrag);});
         window.addEventListener('touchend', endDrag);
 
         // Привязка событий Mouse
+        if(nav
+
+        // Привязка событий Mouse
         if(navBar) {
+            navBar.addEventListener('mousedown', (Bar) {
             navBar.addEventListener('mousedown', (e) => startDrag(e.clientX));
         }
-        window.addEventListener('mousemove', (e) => moveDrag(e.clientX));
+e) => startDrag(e.clientX));
+        }
+        window.addEventListener('mousemove', (e) => moveDrag        window.addEventListener('mousemove', (e) => moveDrag(e.clientX));
+        window.addEventListener('mouseup', endDrag(e.clientX));
         window.addEventListener('mouseup', endDrag);
 
         // Клик по вкладке
+        nav);
+
+        // Клик по вкладке
         navItems.forEach((item, index) => {
+            itemItems.forEach((item, index) => {
             item.addEventListener('click', () => {
+                if (!is.addEventListener('click', () => {
                 if (!isDragging && index !== currentIndex) {
+                    switchTab(indexDragging && index !== currentIndex) {
                     switchTab(index);
                     updatePillPosition(index, true);
-                    if(tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+);
+                    updatePillPosition(index, true);
+                    if(tg?.HapticFeedback) tg.Haptic                    if(tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+                }
+           Feedback.impactOccurred('light');
                 }
             });
         });
 
+        // Пересчет позиции при });
+        });
+
         // Пересчет позиции при повороте экрана
+        window.addEventListener('resize', () повороте экрана
         window.addEventListener('resize', () => {
+            updatePillPosition(currentIndex, false => {
             updatePillPosition(currentIndex, false);
         });
 
     </script>
+</body);
+        });
+
+    </script>
 </body>
+</html>
+```>
 </html>
