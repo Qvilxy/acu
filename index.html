@@ -83,42 +83,49 @@
         /* --- НОВЫЙ ДИЗАЙН БАЛАНСА (ТАБЛЕТКА) --- */
         .balance-pill {
             position: absolute;
-            /* Позиционирование осталось прежним, чтобы не ломать верстку */
-            top: calc(env(safe-area-inset-top, 20px) + 38px); 
+            /* ОПУЩЕНО НА 1 ПИКСЕЛЬ ВНИЗ: было +38px, стало +39px */
+            top: calc(env(safe-area-inset-top, 20px) + 39px); 
             right: 16px; 
             
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px; /* Отступ между цифрой и звездой */
+            gap: 6px; 
             
-            /* Ключевые изменения для размера и адаптивности */
-            height: 32px; /* Фиксированная небольшая высота */
-            min-width: 60px; /* Минимальная ширина для "0" */
-            width: auto; /* Ширина подстраивается под контент */
-            padding: 0 12px; /* Отступы по бокам */
+            /* ИЗМЕНЕНА ШИРИНА: уменьшено на 1px (было 60px, стало 59px) */
+            height: 32px; 
+            min-width: 59px; 
+            width: auto; 
+            padding: 0 12px; 
             
-            /* Дизайн таблетки (как на 2 фото) */
             background: linear-gradient(180deg, #FCD34D 0%, #F59E0B 100%);
-            border-radius: 16px; /* Скругление краев */
+            border-radius: 16px; 
             box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.2);
             
             z-index: 20;
-            transition: width 0.2s ease; /* Плавное расширение при росте баланса */
+            transition: width 0.2s ease, opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        /* Класс для скрытия баланса на других вкладках */
+        .balance-pill.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.9);
         }
 
         .balance-text {
-            font-size: 15px; /* Оптимальный размер шрифта */
+            font-size: 15px; 
             font-weight: 700;
             color: #fff;
             text-shadow: 0 1px 2px rgba(0,0,0,0.1);
             line-height: 1;
-            white-space: nowrap; /* Запрещаем перенос текста */
+            white-space: nowrap; 
         }
 
+        /* ИКОНКА ЗВЕЗДЫ УВЕЛИЧЕНА В 2 РАЗА: было 16px, стало 32px */
         .balance-star-img {
-            height: 16px; /* Размер звезды чуть меньше высоты таблетки */
+            height: 32px; 
             width: auto;
             object-fit: contain;
             display: block;
@@ -359,9 +366,9 @@
         <img src="bcblogotext.PNG" alt="BCB Text Logo" class="header-logo" onerror="this.style.display='none'">
         
         <!-- Обновленная таблетка баланса -->
-        <div class="balance-pill">
+        <div class="balance-pill" id="balance-pill">
             <span class="balance-text">0</span>
-            <!-- Иконка звезды теперь через IMG -->
+            <!-- Иконка звезды увеличена в 2 раза -->
             <img src="iconstar.PNG" alt="★" class="balance-star-img" onerror="this.style.display='none'">
         </div>
     </header>
@@ -461,6 +468,7 @@
         // --- 4. ФИЗИКА МЕНЮ И DRAG-AND-DROP ---
         const navBar = document.getElementById('nav-bar');
         const pill = document.getElementById('active-pill');
+        const balancePill = document.getElementById('balance-pill'); // Ссылка на баланс
         const navItems = document.querySelectorAll('.nav-item');
         const tabContents = document.querySelectorAll('.tab-content');
 
@@ -504,8 +512,20 @@
             currentTranslateX = xPos;
         }
 
+        // Функция управления видимостью баланса
+        function toggleBalanceVisibility(index) {
+            if (!balancePill) return;
+            // Индекс 1 соответствует вкладке "Играть" (tab-play)
+            if (index === 1) {
+                balancePill.classList.remove('hidden');
+            } else {
+                balancePill.classList.add('hidden');
+            }
+        }
+
         setTimeout(() => {
             updatePillPosition(currentIndex, false);
+            toggleBalanceVisibility(currentIndex); // Инициализация видимости
         }, 2100);
 
         const startDrag = (clientX) => {
@@ -563,6 +583,9 @@
                 const targetEl = document.getElementById(targetId);
                 if(targetEl) targetEl.classList.add('active');
             }
+            
+            // Обновляем видимость баланса при переключении
+            toggleBalanceVisibility(newIndex);
         }
 
         if(navBar) {
