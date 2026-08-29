@@ -80,26 +80,26 @@
             filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
         }
 
-        /* --- БАЛАНС (ИЗМЕНЕНЫ ТОЛЬКО РАЗМЕРЫ) --- */
+        /* --- БАЛАНС (КОМПАКТНЫЙ, КАК НА ФОТО 2) --- */
         .balance-pill {
             position: absolute;
-            /* ПОЗИЦИЯ ОСТАЛАСЬ ПРЕЖНЕЙ (+52px), чтобы не сдвигать элемент */
+            /* Позиция осталась прежней */
             top: calc(env(safe-area-inset-top, 20px) + 52px); 
             right: 16px; 
             
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px; 
             
-            /* ИЗМЕНЕННЫЕ РАЗМЕРЫ (Увеличены высота и ширина) */
-            height: 36px; /* Было 28px */
-            min-width: 70px; /* Было 54px */
+            /* УМЕНЬШЕННЫЕ РАЗМЕРЫ ТАБЛЕТКИ */
+            height: 26px; /* Было больше, теперь компактно */
+            min-width: 52px; /* Минимальная ширина для "0" */
             width: auto; 
-            padding: 0 14px; /* Чуть больше отступ внутри */
+            padding: 0 8px; /* Минимальные отступы по бокам */
+            gap: 4px; /* Расстояние между цифрой и иконкой как на фото */
             
             background: linear-gradient(180deg, #FCD34D 0%, #F59E0B 100%);
-            border-radius: 18px; /* Скругление под новую высоту */
+            border-radius: 13px; /* Скругление под новую высоту */
             box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.2);
             
@@ -115,7 +115,7 @@
         }
 
         .balance-text {
-            font-size: 15px; /* Шрифт остался читаемым */
+            font-size: 14px; /* Размер цифры */
             font-weight: 700;
             color: #fff;
             text-shadow: 0 1px 2px rgba(0,0,0,0.1);
@@ -123,9 +123,9 @@
             white-space: nowrap; 
         }
 
-        /* ИКОНКА ВИШНИ */
+        /* ИКОНКА ВИШНИ (РАЗМЕР НЕ МЕНЯЛСЯ, ТОЛЬКО ПОДГОНКА ПО ЦЕНТРУ) */
         .balance-star-img {
-            height: 22px; /* Размер иконки подобран под новую высоту таблетки */
+            height: 18px; /* Оптимальный размер для новой высоты таблетки */
             width: auto;
             object-fit: contain;
             display: block;
@@ -365,7 +365,7 @@
     <header>
         <img src="bcblogotext.PNG" alt="BCB Text Logo" class="header-logo" onerror="this.style.display='none'">
         
-        <!-- Таблетка с измененными размерами -->
+        <!-- Компактная таблетка баланса -->
         <div class="balance-pill" id="balance-pill">
             <span class="balance-text">0</span>
             <img src="iconcherry.PNG" alt="🍒" class="balance-star-img" onerror="this.style.display='none'">
