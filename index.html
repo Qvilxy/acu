@@ -80,10 +80,10 @@
             filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
         }
 
-        /* --- БАЛАНС (МАЛЕНЬКАЯ ТАБЛЕТКА + БОЛЬШАЯ ВИШНЯ) --- */
+        /* --- БАЛАНС (ИЗМЕНЕНЫ ТОЛЬКО РАЗМЕРЫ) --- */
         .balance-pill {
             position: absolute;
-            /* Позиция ниже интерфейса Telegram (+52px) */
+            /* ПОЗИЦИЯ ОСТАЛАСЬ ПРЕЖНЕЙ (+52px), чтобы не сдвигать элемент */
             top: calc(env(safe-area-inset-top, 20px) + 52px); 
             right: 16px; 
             
@@ -92,14 +92,14 @@
             justify-content: center;
             gap: 6px; 
             
-            /* РАЗМЕРЫ ТАБЛЕТКИ ВЕРНУТЫ К МАЛЕНЬКИМ ЗНАЧЕНИЯМ */
-            height: 28px; 
-            min-width: 54px; 
+            /* ИЗМЕНЕННЫЕ РАЗМЕРЫ (Увеличены высота и ширина) */
+            height: 36px; /* Было 28px */
+            min-width: 70px; /* Было 54px */
             width: auto; 
-            padding: 0 10px; 
+            padding: 0 14px; /* Чуть больше отступ внутри */
             
             background: linear-gradient(180deg, #FCD34D 0%, #F59E0B 100%);
-            border-radius: 14px; 
+            border-radius: 18px; /* Скругление под новую высоту */
             box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.2);
             
@@ -115,7 +115,7 @@
         }
 
         .balance-text {
-            font-size: 13px; /* Маленький шрифт под размер таблетки */
+            font-size: 15px; /* Шрифт остался читаемым */
             font-weight: 700;
             color: #fff;
             text-shadow: 0 1px 2px rgba(0,0,0,0.1);
@@ -123,14 +123,12 @@
             white-space: nowrap; 
         }
 
-        /* ИКОНКА ВИШНИ: ОСТАЛАСЬ БОЛЬШОЙ (29px), КАК ТЫ ПРОСИЛ */
+        /* ИКОНКА ВИШНИ */
         .balance-star-img {
-            height: 29px; 
+            height: 22px; /* Размер иконки подобран под новую высоту таблетки */
             width: auto;
             object-fit: contain;
             display: block;
-            /* Центрируем относительно таблетки, несмотря на размер */
-            margin-bottom: 0; 
         }
 
         /* --- Основной контент --- */
@@ -367,7 +365,7 @@
     <header>
         <img src="bcblogotext.PNG" alt="BCB Text Logo" class="header-logo" onerror="this.style.display='none'">
         
-        <!-- Таблетка маленькая, вишня большая -->
+        <!-- Таблетка с измененными размерами -->
         <div class="balance-pill" id="balance-pill">
             <span class="balance-text">0</span>
             <img src="iconcherry.PNG" alt="🍒" class="balance-star-img" onerror="this.style.display='none'">
