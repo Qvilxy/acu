@@ -60,11 +60,14 @@
 
         /* --- ШАПКА ПРИЛОЖЕНИЯ --- */
         header {
+            /* Фиксированная высота 120px + отступ под челку iPhone */
             height: 120px; 
             padding-top: env(safe-area-inset-top, 20px); 
+            
             display: flex;
             justify-content: center;
             align-items: center;
+            
             background: transparent; 
             flex-shrink: 0;
             z-index: 10;
@@ -72,7 +75,8 @@
         }
 
         .header-logo {
-            height: 75px; 
+            /* Размер логотипа адаптируется под высоту шапки */
+            max-height: 80px; 
             width: auto;
             max-width: 90%;
             object-fit: contain;
@@ -169,7 +173,7 @@
             z-index: 1000;
             overflow: hidden;
             
-            /* КРИТИЧЕСКИ ВАЖНО: Отключаем системные жесты браузера в зоне меню */
+            /* Отключаем системные жесты браузера в зоне меню */
             touch-action: none; 
             -webkit-touch-callout: none;
         }
@@ -229,15 +233,16 @@
             -webkit-backdrop-filter: blur(12px);
             border: 2px solid transparent; 
             
+            /* Тень только для объема самой плитки, без цветного свечения */
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             
-            /* Выносим анимацию на GPU для предотвращения двоения */
+            /* Оптимизация для GPU */
             will-change: transform;
             
-            /* Используем CSS переменные */
+            /* Используем CSS переменные для позиции и масштаба */
             transform: translateX(var(--tx, 0px)) scale(var(--scale, 1));
             
-            /* Плавная анимация по умолчанию (только для цвета и тени) */
+            /* Плавность только для цвета и тени, НЕ для transform во время драга */
             transition: 
                 background 0.3s ease,
                 border-color 0.3s ease, 
@@ -249,19 +254,15 @@
         .glass-pill.animating {
             background: rgba(255, 255, 255, 0.25);
             
-            /* Радужная рамка (Мыльный пузырь) */
+            /* Радужная рамка (Мыльный пузырь) - БЕЗ СВЕЧЕНИЯ ВОКРУГ */
             border: 2px solid transparent;
             background-image: 
-                linear-gradient(#2a0a1a, #2a0a1a), 
+                linear-gradient(#2a0a1a, #2a0a1a), /* Цвет фона внутри рамки */
                 conic-gradient(from 0deg, #ff00cc, #3333ff, #00ffcc, #ffff00, #ff00cc);
             background-origin: border-box;
             background-clip: padding-box, border-box;
             
-            /* Голографическое свечение */
-            box-shadow: 
-                0 0 15px rgba(255, 0, 204, 0.4),
-                0 0 30px rgba(0, 255, 204, 0.2),
-                inset 0 0 10px rgba(255, 255, 255, 0.2);
+            /* Убраны box-shadow, чтобы не было ореола */
         }
 
         /* Специфика перетаскивания: ПОЛНОСТЬЮ отключаем transition для transform */
@@ -280,8 +281,8 @@
 
     <!-- Шапка -->
     <header>
-        <!-- Убедитесь, что файл называется именно bcbtextlogo.PNG и лежит рядом с index.html -->
-        <img src="bcbtextlogo.PNG" alt="BCB Text Logo" class="header-logo" onerror="this.style.display='none'">
+        <!-- Путь к логотипу: bcblogotext.PNG -->
+        <img src="bcblogotext.PNG" alt="BCB Text Logo" class="header-logo" onerror="this.style.display='none'">
     </header>
 
     <!-- Контент -->
