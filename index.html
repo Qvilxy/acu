@@ -69,6 +69,7 @@
             flex-shrink: 0;
             z-index: 10;
             width: 100%;
+            position: relative; /* Для позиционирования баланса */
         }
 
         .header-logo {
@@ -77,6 +78,49 @@
             max-width: 90%;
             object-fit: contain;
             filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+        }
+
+        /* --- БАЛАНС (Звезды) --- */
+        .balance-pill {
+            position: absolute;
+            /* Позиционирование по зеленым линиям:
+               Top: выравниваем по центру кнопок Telegram (примерно 50-60px от верха с учетом safe-area)
+               Right: выравниваем правый край по границе меню Telegram (около 16-20px от края экрана)
+            */
+            top: calc(env(safe-area-inset-top, 20px) + 38px); 
+            right: 16px; 
+            
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            
+            padding: 6px 14px;
+            min-width: 80px;
+            height: 36px;
+            
+            /* Дизайн таблетки */
+            background: linear-gradient(135deg, #FCD34D 0%, #F59E0B 100%);
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            
+            z-index: 20;
+        }
+
+        .balance-text {
+            font-size: 16px;
+            font-weight: 800;
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            line-height: 1;
+        }
+
+        .balance-star {
+            width: 18px;
+            height: 18px;
+            fill: #fff;
+            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
         }
 
         /* --- Основной контент --- */
@@ -145,7 +189,6 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            /* Убраны лишние отступы, юзернейм будет сразу под именем */
             line-height: 1; 
         }
 
@@ -161,7 +204,6 @@
             font-size: 1.1em;
             color: rgba(255, 255, 255, 0.6);
             font-weight: 500;
-            /* Юзернейм начинается ровно там, где заканчивается имя */
             margin-top: 0; 
             padding-top: 0;
         }
@@ -238,7 +280,6 @@
             animation: spinGear 0.6s ease-in-out;
         }
         
-        /* Анимация нажатия на консоль */
         .nav-item.active-text svg.icon-gamepad {
             animation: pressGamepad 0.4s ease-in-out;
         }
@@ -252,12 +293,11 @@
             to { transform: rotate(180deg); }
         }
 
-        /* Эффект нажатия кнопок геймпада */
         @keyframes pressGamepad {
             0% { transform: scaleX(1) scaleY(1); }
-            25% { transform: scaleX(0.85) scaleY(1.1) translateX(2px); } /* Нажатие правой части */
+            25% { transform: scaleX(0.85) scaleY(1.1) translateX(2px); }
             50% { transform: scaleX(1) scaleY(1); }
-            75% { transform: scaleX(0.85) scaleY(1.1) translateX(-2px); } /* Нажатие левой части */
+            75% { transform: scaleX(0.85) scaleY(1.1) translateX(-2px); }
             100% { transform: scaleX(1) scaleY(1); }
         }
 
@@ -272,7 +312,6 @@
             position: absolute;
             top: 6px;
             left: 6px;
-            /* Ширина задается через JS переменную для идеальной точности */
             width: var(--pill-width, calc((100% - 12px) / 3)); 
             height: calc(100% - 12px);
             border-radius: 32px;
@@ -317,6 +356,15 @@
     <!-- Шапка -->
     <header>
         <img src="bcblogotext.PNG" alt="BCB Text Logo" class="header-logo" onerror="this.style.display='none'">
+        
+        <!-- Баланс (Звезды) -->
+        <div class="balance-pill">
+            <span class="balance-text">0</span>
+            <!-- SVG Звезда -->
+            <svg class="balance-star" viewBox="0 0 24 24">
+                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+            </svg>
+        </div>
     </header>
 
     <!-- Контент -->
@@ -340,7 +388,6 @@
                 
                 <div class="user-name-wrapper">
                     <div id="profile-name" class="user-name">Загрузка...</div>
-                    <!-- Юзернейм теперь начинается сразу здесь, без лишних элементов -->
                     <div id="profile-username" class="user-username">@...</div>
                 </div>
                 
@@ -424,7 +471,6 @@
         let currentTranslateX = 0; 
         
         function getStepWidth() { 
-            // Вычисляем точную ширину одной секции
             return navBar ? (navBar.offsetWidth - 12) / 3 : 100; 
         }
 
@@ -434,10 +480,8 @@
             const step = getStepWidth();
             const xPos = index * step; 
             
-            // Задаем точную ширину плитки через переменную, чтобы она идеально совпадала с шириной секции
             pill.style.setProperty('--pill-width', `${step}px`);
             
-            // Управление классами эффектов
             if (isDragging) {
                 pill.classList.add('dragging');
                 pill.classList.remove('animating');
@@ -448,7 +492,6 @@
                 pill.classList.remove('dragging');
                 pill.classList.add('animating');
                 
-                // Пружинистая анимация при отпускании
                 pill.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease';
                 
                 setTimeout(() => {
@@ -456,14 +499,12 @@
                 }, 500);
             }
             
-            // Применяем позицию через CSS переменную
             pill.style.setProperty('--tx', `${xPos}px`);
             pill.style.setProperty('--scale', isDragging ? 1.1 : 1);
             
             currentTranslateX = xPos;
         }
 
-        // Инициализация позиции меню
         setTimeout(() => {
             updatePillPosition(currentIndex, false);
         }, 2100);
@@ -483,12 +524,10 @@
             const step = getStepWidth();
             const maxIndex = 2;
             
-            // Эластичность на краях
             const limit = step * 0.4; 
             if (newX < -limit) newX = -limit + (newX + limit) * 0.2;
             if (newX > (maxIndex * step) + limit) newX = (maxIndex * step) + limit + (newX - ((maxIndex * step) + limit)) * 0.2;
 
-            // Мгновенное обновление позиции без transition
             pill.style.setProperty('--tx', `${newX}px`);
             currentTranslateX = newX;
         };
@@ -527,7 +566,6 @@
             }
         }
 
-        // Привязка событий Touch
         if(navBar) {
             navBar.addEventListener('touchstart', (e) => startDrag(e.touches[0].clientX), {passive: false});
         }
@@ -539,14 +577,12 @@
         }, {passive: false});
         window.addEventListener('touchend', endDrag);
 
-        // Привязка событий Mouse
         if(navBar) {
             navBar.addEventListener('mousedown', (e) => startDrag(e.clientX));
         }
         window.addEventListener('mousemove', (e) => moveDrag(e.clientX));
         window.addEventListener('mouseup', endDrag);
 
-        // Клик по вкладке
         navItems.forEach((item, index) => {
             item.addEventListener('click', () => {
                 if (!isDragging && index !== currentIndex) {
@@ -557,7 +593,6 @@
             });
         });
 
-        // Пересчет позиции при повороте экрана
         window.addEventListener('resize', () => {
             updatePillPosition(currentIndex, false);
         });
