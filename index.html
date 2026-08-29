@@ -69,7 +69,7 @@
             flex-shrink: 0;
             z-index: 10;
             width: 100%;
-            position: relative; /* Для позиционирования баланса */
+            position: relative; 
         }
 
         .header-logo {
@@ -80,47 +80,48 @@
             filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
         }
 
-        /* --- БАЛАНС (Звезды) --- */
+        /* --- НОВЫЙ ДИЗАЙН БАЛАНСА (ТАБЛЕТКА) --- */
         .balance-pill {
             position: absolute;
-            /* Позиционирование по зеленым линиям:
-               Top: выравниваем по центру кнопок Telegram (примерно 50-60px от верха с учетом safe-area)
-               Right: выравниваем правый край по границе меню Telegram (около 16-20px от края экрана)
-            */
+            /* Позиционирование осталось прежним, чтобы не ломать верстку */
             top: calc(env(safe-area-inset-top, 20px) + 38px); 
             right: 16px; 
             
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 6px; /* Отступ между цифрой и звездой */
             
-            padding: 6px 14px;
-            min-width: 80px;
-            height: 36px;
+            /* Ключевые изменения для размера и адаптивности */
+            height: 32px; /* Фиксированная небольшая высота */
+            min-width: 60px; /* Минимальная ширина для "0" */
+            width: auto; /* Ширина подстраивается под контент */
+            padding: 0 12px; /* Отступы по бокам */
             
-            /* Дизайн таблетки */
-            background: linear-gradient(135deg, #FCD34D 0%, #F59E0B 100%);
-            border-radius: 20px;
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+            /* Дизайн таблетки (как на 2 фото) */
+            background: linear-gradient(180deg, #FCD34D 0%, #F59E0B 100%);
+            border-radius: 16px; /* Скругление краев */
+            box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.2);
             
             z-index: 20;
+            transition: width 0.2s ease; /* Плавное расширение при росте баланса */
         }
 
         .balance-text {
-            font-size: 16px;
-            font-weight: 800;
+            font-size: 15px; /* Оптимальный размер шрифта */
+            font-weight: 700;
             color: #fff;
             text-shadow: 0 1px 2px rgba(0,0,0,0.1);
             line-height: 1;
+            white-space: nowrap; /* Запрещаем перенос текста */
         }
 
-        .balance-star {
-            width: 18px;
-            height: 18px;
-            fill: #fff;
-            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
+        .balance-star-img {
+            height: 16px; /* Размер звезды чуть меньше высоты таблетки */
+            width: auto;
+            object-fit: contain;
+            display: block;
         }
 
         /* --- Основной контент --- */
@@ -148,7 +149,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Вкладка "В разработке" - идеальное центрирование по экрану */
+        /* Вкладка "В разработке" */
         .dev-placeholder {
             display: flex;
             flex-direction: column;
@@ -197,7 +198,7 @@
             font-weight: 700;
             letter-spacing: 0.5px;
             text-shadow: none; 
-            margin-bottom: 2px; /* Минимальный отступ до начала юзернейма */
+            margin-bottom: 2px; 
         }
 
         .user-username {
@@ -357,13 +358,11 @@
     <header>
         <img src="bcblogotext.PNG" alt="BCB Text Logo" class="header-logo" onerror="this.style.display='none'">
         
-        <!-- Баланс (Звезды) -->
+        <!-- Обновленная таблетка баланса -->
         <div class="balance-pill">
             <span class="balance-text">0</span>
-            <!-- SVG Звезда -->
-            <svg class="balance-star" viewBox="0 0 24 24">
-                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
-            </svg>
+            <!-- Иконка звезды теперь через IMG -->
+            <img src="iconstar.PNG" alt="★" class="balance-star-img" onerror="this.style.display='none'">
         </div>
     </header>
 
