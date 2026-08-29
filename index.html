@@ -17,7 +17,6 @@
             -webkit-tap-highlight-color: transparent;
             user-select: none;
             -webkit-user-select: none;
-            /* Запрещаем выделение текста везде */
         }
 
         body {
@@ -31,7 +30,7 @@
             flex-direction: column;
         }
 
-        /* --- Экран загрузки (Защита от зависания) --- */
+        /* --- Экран загрузки --- */
         #loading-screen {
             position: fixed;
             top: 0;
@@ -57,30 +56,22 @@
             max-width: 250px;
             height: auto;
             object-fit: contain;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
         }
 
-        /* --- ШАПКА ПРИЛОЖЕНИЯ (ОБНОВЛЕНА) --- */
+        /* --- ШАПКА ПРИЛОЖЕНИЯ --- */
         header {
-            /* Фиксированная высота 120px + безопасная зона для челки iPhone */
             height: 120px; 
             padding-top: env(safe-area-inset-top, 20px); 
-            
             display: flex;
             justify-content: center;
             align-items: center;
-            
-            /* Прозрачный фон, сливается с градиентом */
             background: transparent; 
-            
             flex-shrink: 0;
             z-index: 10;
             width: 100%;
         }
 
         .header-logo {
-            /* Логотип адаптируется под высоту шапки */
             height: 75px; 
             width: auto;
             max-width: 90%;
@@ -93,7 +84,6 @@
             flex-grow: 1;
             position: relative;
             overflow-y: auto;
-            /* Отступ снизу, чтобы контент не перекрывался меню */
             padding-bottom: 120px; 
             width: 100%;
         }
@@ -114,7 +104,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Стили для вкладки "В разработке" */
         .dev-placeholder {
             display: flex;
             flex-direction: column;
@@ -126,7 +115,6 @@
             font-weight: 500;
         }
 
-        /* Стили для вкладки "Профиль" */
         .profile-container {
             display: flex;
             flex-direction: column;
@@ -181,7 +169,7 @@
             z-index: 1000;
             overflow: hidden;
             
-            /* КРИТИЧЕСКИ ВАЖНО ДЛЯ ПЛАВНОСТИ: отключаем системные жесты браузера в этой зоне */
+            /* КРИТИЧЕСКИ ВАЖНО: Отключаем системные жесты браузера в зоне меню */
             touch-action: none; 
             -webkit-touch-callout: none;
         }
@@ -235,7 +223,7 @@
             border-radius: 32px;
             z-index: 1;
             
-            /* Базовое состояние: чистое стекло без рамки */
+            /* Базовое состояние */
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
@@ -243,14 +231,14 @@
             
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             
-            will-change: transform, background, border-color, box-shadow;
+            /* Выносим анимацию на GPU для предотвращения двоения */
+            will-change: transform;
             
-            /* Используем CSS переменные для разделения движения и масштаба */
+            /* Используем CSS переменные */
             transform: translateX(var(--tx, 0px)) scale(var(--scale, 1));
             
-            /* Плавная анимация по умолчанию */
+            /* Плавная анимация по умолчанию (только для цвета и тени) */
             transition: 
-                transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), 
                 background 0.3s ease,
                 border-color 0.3s ease, 
                 box-shadow 0.3s ease; 
@@ -276,13 +264,9 @@
                 inset 0 0 10px rgba(255, 255, 255, 0.2);
         }
 
-        /* Специфика перетаскивания: мгновенная реакция на палец */
+        /* Специфика перетаскивания: ПОЛНОСТЬЮ отключаем transition для transform */
         .glass-pill.dragging {
-            transition: 
-                background 0.1s,
-                border-color 0.1s, 
-                box-shadow 0.1s;
-            /* Transform не анимируется во время драга, чтобы не было задержки */
+            /* Никаких transition здесь! Это убирает дергание */
         }
 
     </style>
@@ -296,6 +280,7 @@
 
     <!-- Шапка -->
     <header>
+        <!-- Убедитесь, что файл называется именно bcbtextlogo.PNG и лежит рядом с index.html -->
         <img src="bcbtextlogo.PNG" alt="BCB Text Logo" class="header-logo" onerror="this.style.display='none'">
     </header>
 
@@ -378,7 +363,7 @@
         nameDiv.textContent = user.first_name + (user.last_name ? ' ' + user.last_name : '') || 'Игрок BCB';
         usernameDiv.textContent = user.username ? '@' + user.username : 'Нет юзернейма';
 
-        // --- 3. ЖЕСТКАЯ ЛОГИКА ЗАГРУЗКИ (ANTI-HANG) ---
+        // --- 3. ЛОГИКА ЗАГРУЗКИ ---
         const loadingScreen = document.getElementById('loading-screen');
         
         // Принудительное скрытие через 2 секунды
@@ -416,12 +401,14 @@
                 pill.classList.remove('animating');
             } else if (!animate) {
                 pill.classList.remove('dragging', 'animating');
+                // При инициализации transition не нужен
                 pill.style.transition = 'none';
             } else {
+                // Анимация полета (snap)
                 pill.classList.remove('dragging');
                 pill.classList.add('animating');
                 
-                // Восстанавливаем пружинистую анимацию
+                // Включаем плавную пружинистую анимацию ТОЛЬКО для transform
                 pill.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease';
                 
                 // Убираем эффект радуги после завершения полета
@@ -437,7 +424,7 @@
             currentTranslateX = xPos;
         }
 
-        // Инициализация позиции меню после гарантированного исчезновения загрузки
+        // Инициализация позиции меню
         setTimeout(() => {
             updatePillPosition(currentIndex, false);
         }, 2100);
@@ -462,6 +449,7 @@
             if (newX < -limit) newX = -limit + (newX + limit) * 0.2;
             if (newX > (maxIndex * step) + limit) newX = (maxIndex * step) + limit + (newX - ((maxIndex * step) + limit)) * 0.2;
 
+            // Обновляем ТОЛЬКО переменную --tx. Transform применяется мгновенно без transition
             pill.style.setProperty('--tx', `${newX}px`);
             currentTranslateX = newX;
         };
@@ -481,7 +469,7 @@
                 switchTab(newIndex);
             }
 
-            // Запускаем анимацию прилета (будет радужной благодаря классу animating)
+            // Запускаем анимацию прилета
             updatePillPosition(newIndex, true);
             
             if(tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
@@ -507,7 +495,7 @@
         }
         window.addEventListener('touchmove', (e) => {
             if(isDragging) {
-                e.preventDefault(); // Блокируем скролл страницы при драге (важно для плавности!)
+                e.preventDefault(); // Блокируем скролл страницы при драге
                 moveDrag(e.touches[0].clientX);
             }
         }, {passive: false});
@@ -520,7 +508,7 @@
         window.addEventListener('mousemove', (e) => moveDrag(e.clientX));
         window.addEventListener('mouseup', endDrag);
 
-        // Клик по вкладке (если не был драг)
+        // Клик по вкладке
         navItems.forEach((item, index) => {
             item.addEventListener('click', () => {
                 if (!isDragging && index !== currentIndex) {
