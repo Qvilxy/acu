@@ -83,7 +83,6 @@
         /* --- БАЛАНС (КОМПАКТНЫЙ) --- */
         .balance-pill {
             position: absolute;
-            /* Позиция осталась прежней */
             top: calc(env(safe-area-inset-top, 20px) + 52px); 
             right: 16px; 
             
@@ -91,7 +90,6 @@
             align-items: center;
             justify-content: center;
             
-            /* РАЗМЕРЫ ТАБЛЕТКИ НЕ ТРОНУТЫ */
             height: 26px; 
             min-width: 52px; 
             width: auto; 
@@ -107,7 +105,6 @@
             transition: width 0.2s ease, opacity 0.3s ease, transform 0.3s ease;
         }
 
-        /* Класс для скрытия баланса на других вкладках */
         .balance-pill.hidden {
             opacity: 0;
             pointer-events: none;
@@ -123,7 +120,6 @@
             white-space: nowrap; 
         }
 
-        /* ИКОНКА ВИШНИ: УВЕЛИЧЕНА В 1.5 РАЗА (было 18px -> стало 27px) */
         .balance-star-img {
             height: 27px; 
             width: auto;
@@ -156,20 +152,20 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Вкладка "В разработке" */
+        /* Вкладка "В разработке" - ИДЕАЛЬНОЕ ЦЕНТРИРОВАНИЕ И БЛОКИРОВКА СКРОЛЛА */
         .dev-placeholder {
+            position: absolute; /* Фиксируем относительно main */
+            inset: 0;           /* Растягиваем на весь экран (top/right/bottom/left: 0) */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100dvh;
             color: rgba(255, 255, 255, 0.4);
             font-size: 1.2em;
             font-weight: 500;
             width: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
+            height: 100%;       /* Занимает всю высоту */
+            overflow: hidden;   /* Убираем возможность скролла */
         }
 
         /* Стили для вкладки "Профиль" */
