@@ -152,7 +152,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Вкладка "В разработке" */
+        /* Вкладка "Рефералы" (бывшая dev) */
         .dev-placeholder {
             position: absolute;
             inset: 0;
@@ -167,6 +167,136 @@
             height: 100%;
             overflow: hidden;
         }
+
+        /* --- ВКЛАДКА ИГРАТЬ (СЛАЙДЕР РЕЖИМОВ) --- */
+        #tab-play {
+            display: none; /* Управляем через JS/CSS active */
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            height: 100%;
+            position: relative;
+        }
+        
+        #tab-play.active {
+            display: flex;
+        }
+
+        /* Контейнер для списка игр и ползунка */
+        .games-wrapper {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* Область с карточками */
+        .games-list {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px; /* Отступ между большим и маленьким блоком */
+            overflow: hidden; /* Скрываем то, что выходит за пределы */
+            padding-right: 20px; /* Место под ползунок */
+        }
+
+        /* Общий стиль карточки игры */
+        .game-card {
+            background: #2A2A2A; /* Темно-серый цвет */
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); /* Пружинистая анимация */
+            position: relative;
+        }
+
+        /* Иконка замка внутри карточки */
+        .lock-icon {
+            width: 60px;
+            height: 60px;
+            fill: white;
+            opacity: 0.8;
+        }
+
+        /* БОЛЬШАЯ КАРТОЧКА (Активная) */
+        .game-card.large {
+            flex: 1; /* Занимает все доступное место */
+            min-height: 300px; /* Минимальная высота квадрата */
+        }
+
+        /* МАЛЕНЬКАЯ КАРТОЧКА (Следующая) */
+        .game-card.small {
+            height: 100px; /* Фиксированная небольшая высота */
+            flex-shrink: 0;
+            opacity: 0.6; /* Чуть прозрачнее */
+            transform: scale(0.95);
+        }
+
+        /* АНИМАЦИЯ ЖЕЛЕ (JELLY WOBBLE) */
+        .jelly-effect {
+            animation: jellyWobble 0.6s ease-in-out;
+        }
+
+        @keyframes jellyWobble {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.05, 0.95); } /* Сплющивание */
+            50% { transform: scale(0.95, 1.05); } /* Растягивание */
+            75% { transform: scale(1.02, 0.98); }
+            100% { transform: scale(1); }
+        }
+
+        /* ПОЛЗУНОК СПРАВА */
+        .scroll-track {
+            width: 6px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 10px 0;
+        }
+
+        /* Точки на ползунке */
+        .track-dot {
+            width: 6px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            margin: 5px 0;
+            transition: all 0.3s;
+        }
+
+        /* Активный индикатор на ползунке */
+        .track-indicator {
+            position: absolute;
+            left: -2px; /* Центрируем относительно трека шириной 6px */
+            width: 10px;
+            height: 30px; /* Высота бегунка */
+            background: #FCD34D;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(252, 211, 77, 0.6);
+            transition: top 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); /* Тоже пружинит */
+            z-index: 2;
+        }
+        
+        /* Эффект желе для индикатора */
+        .indicator-jelly {
+            animation: indicatorStretch 0.6s ease-in-out;
+        }
+
+        @keyframes indicatorStretch {
+            0% { transform: scaleY(1); }
+            50% { transform: scaleY(1.3); } /* Растягивается по вертикали при движении */
+            100% { transform: scaleY(1); }
+        }
+
 
         /* Стили для вкладки "Профиль" */
         .profile-container {
@@ -286,11 +416,10 @@
 
         @keyframes stretchChain {
             0% { transform: scaleX(1); }
-            40% { transform: scaleX(1.6); } /* Растягивается */
-            100% { transform: scaleX(1); }  /* Возвращается в норму */
+            40% { transform: scaleX(1.6); }
+            100% { transform: scaleX(1); }
         }
 
-        /* Остальные анимации */
         .nav-item.active-text svg.icon-gamepad {
             animation: pressGamepad 0.4s ease-in-out;
         }
@@ -313,7 +442,7 @@
             100% { transform: scale(1); }
         }
 
-        /* --- ИНДИКАТОР (ПЛИТКА) --- */
+        /* --- ИНДИКАТОР МЕНЮ (ПЛИТКА) --- */
         .glass-pill {
             position: absolute;
             top: 6px;
@@ -363,7 +492,7 @@
     <header>
         <img src="bcblogotext.PNG" alt="BCB Text Logo" class="header-logo" onerror="this.style.display='none'">
         
-        <!-- Таблетка с увеличенной вишней -->
+        <!-- Таблетка баланса -->
         <div class="balance-pill" id="balance-pill">
             <span class="balance-text">0</span>
             <img src="iconcherry.PNG" alt="" class="balance-star-img" onerror="this.style.display='none'">
@@ -379,9 +508,20 @@
             </div>
         </div>
 
-        <!-- Вкладка 2: Играть (Активна по умолчанию) -->
+        <!-- Вкладка 2: Играть (Слайдер режимов) -->
         <div id="tab-play" class="tab-content active">
-            <!-- Пустой фон -->
+            <div class="games-wrapper">
+                <!-- Список игр -->
+                <div class="games-list" id="games-list">
+                    <!-- Карточки генерируются JS -->
+                </div>
+
+                <!-- Ползунок справа -->
+                <div class="scroll-track" id="scroll-track">
+                    <div class="track-indicator" id="track-indicator"></div>
+                    <!-- Точки генерируются JS -->
+                </div>
+            </div>
         </div>
 
         <!-- Вкладка 3: Профиль -->
@@ -405,7 +545,7 @@
 
         <!-- Трек с кнопками -->
         <div class="nav-track">
-            <!-- Вкладка 1: РЕФЕРАЛЫ (Иконка цепи) -->
+            <!-- Вкладка 1: РЕФЕРАЛЫ -->
             <div class="nav-item" data-target="tab-dev" data-index="0">
                 <svg class="icon-chain" viewBox="0 0 24 24">
                     <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
@@ -470,11 +610,11 @@
         // --- 4. ФИЗИКА МЕНЮ И DRAG-AND-DROP ---
         const navBar = document.getElementById('nav-bar');
         const pill = document.getElementById('active-pill');
-        const balancePill = document.getElementById('balance-pill'); // Ссылка на баланс
+        const balancePill = document.getElementById('balance-pill'); 
         const navItems = document.querySelectorAll('.nav-item');
         const tabContents = document.querySelectorAll('.tab-content');
 
-        let currentIndex = 1; // Начинаем с "Играть"
+        let currentIndex = 1; 
         let isDragging = false;
         let startX = 0;
         let currentTranslateX = 0; 
@@ -514,10 +654,8 @@
             currentTranslateX = xPos;
         }
 
-        // Функция управления видимостью баланса
         function toggleBalanceVisibility(index) {
             if (!balancePill) return;
-            // Индекс 1 соответствует вкладке "Играть" (tab-play)
             if (index === 1) {
                 balancePill.classList.remove('hidden');
             } else {
@@ -527,7 +665,7 @@
 
         setTimeout(() => {
             updatePillPosition(currentIndex, false);
-            toggleBalanceVisibility(currentIndex); // Инициализация видимости
+            toggleBalanceVisibility(currentIndex);
         }, 2100);
 
         const startDrag = (clientX) => {
@@ -586,7 +724,6 @@
                 if(targetEl) targetEl.classList.add('active');
             }
             
-            // Обновляем видимость баланса при переключении
             toggleBalanceVisibility(newIndex);
         }
 
@@ -620,6 +757,105 @@
         window.addEventListener('resize', () => {
             updatePillPosition(currentIndex, false);
         });
+
+        // --- 5. ЛОГИКА ИГРОВЫХ РЕЖИМОВ (СЛАЙДЕР) ---
+        const gamesList = document.getElementById('games-list');
+        const scrollTrack = document.getElementById('scroll-track');
+        const trackIndicator = document.getElementById('track-indicator');
+        
+        // Данные режимов (3 штуки для эксперимента)
+        const gameModes = [
+            { id: 1, name: 'Рулетка' },
+            { id: 2, name: 'Сапёр' },
+            { id: 3, name: 'Crash' }
+        ];
+
+        let currentGameIndex = 0;
+        let autoSwitchInterval;
+
+        // SVG иконка замка
+        const lockSvg = `
+            <svg class="lock-icon" viewBox="0 0 24 24">
+                <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+            </svg>
+        `;
+
+        // Инициализация слайдера
+        function initGamesSlider() {
+            // Создаем точки на ползунке
+            gameModes.forEach((_, i) => {
+                const dot = document.createElement('div');
+                dot.className = 'track-dot';
+                scrollTrack.appendChild(dot);
+            });
+
+            renderGames();
+            updateScrollIndicator();
+            
+            // Запуск таймера на 15 секунд
+            startAutoSwitch();
+        }
+
+        function renderGames() {
+            gamesList.innerHTML = ''; // Очистка
+
+            // Текущий режим (Большой)
+            const currentMode = gameModes[currentGameIndex];
+            const currentCard = document.createElement('div');
+            currentCard.className = 'game-card large jelly-effect'; // Добавляем эффект желе
+            currentCard.innerHTML = lockSvg;
+            gamesList.appendChild(currentCard);
+
+            // Следующий режим (Маленький)
+            const nextIndex = (currentGameIndex + 1) % gameModes.length;
+            const nextMode = gameModes[nextIndex];
+            const nextCard = document.createElement('div');
+            nextCard.className = 'game-card small jelly-effect'; // Добавляем эффект желе
+            nextCard.innerHTML = lockSvg;
+            gamesList.appendChild(nextCard);
+        }
+
+        function updateScrollIndicator() {
+            const dots = document.querySelectorAll('.track-dot');
+            const totalHeight = scrollTrack.offsetHeight;
+            const dotCount = dots.length;
+            
+            // Вычисляем позицию индикатора
+            // Расстояние между центрами точек
+            const step = (totalHeight - 40) / (dotCount - 1); // 40px - отступы сверху/снизу
+            
+            // Позиция текущей точки (учитывая padding 10px)
+            const currentTop = 10 + (currentGameIndex * step);
+            
+            trackIndicator.style.top = `${currentTop - 12}px`; // -12 чтобы центрировать индикатор высотой 30px относительно точки
+            
+            // Анимация желе для индикатора
+            trackIndicator.classList.remove('indicator-jelly');
+            void trackIndicator.offsetWidth; // Триггер перерисовки
+            trackIndicator.classList.add('indicator-jelly');
+        }
+
+        function switchGameMode() {
+            currentGameIndex = (currentGameIndex + 1) % gameModes.length;
+            renderGames();
+            updateScrollIndicator();
+            
+            // Вибрация при смене (если поддерживается)
+            if(tg?.HapticFeedback) tg.HapticFeedback.lightImpactOccurred();
+        }
+
+        function startAutoSwitch() {
+            if (autoSwitchInterval) clearInterval(autoSwitchInterval);
+            autoSwitchInterval = setInterval(() => {
+                // Переключаем только если мы на вкладке "Играть"
+                if (currentIndex === 1) {
+                    switchGameMode();
+                }
+            }, 15000); // 15 секунд
+        }
+
+        // Запускаем слайдер после загрузки
+        setTimeout(initGamesSlider, 2200);
 
     </script>
 </body>
