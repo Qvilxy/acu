@@ -152,10 +152,10 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Вкладка "В разработке" - ИДЕАЛЬНОЕ ЦЕНТРИРОВАНИЕ И БЛОКИРОВКА СКРОЛЛА */
+        /* Вкладка "В разработке" */
         .dev-placeholder {
-            position: absolute; /* Фиксируем относительно main */
-            inset: 0;           /* Растягиваем на весь экран (top/right/bottom/left: 0) */
+            position: absolute;
+            inset: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -164,8 +164,8 @@
             font-size: 1.2em;
             font-weight: 500;
             width: 100%;
-            height: 100%;       /* Занимает всю высоту */
-            overflow: hidden;   /* Убираем возможность скролла */
+            height: 100%;
+            overflow: hidden;
         }
 
         /* Стили для вкладки "Профиль" */
@@ -279,22 +279,24 @@
             color: #F2F2F7;
         }
 
-        /* Анимации иконок при активации */
-        .nav-item.active-text svg.icon-gear {
-            animation: spinGear 0.6s ease-in-out;
+        /* АНИМАЦИЯ ЦЕПИ (РАСТЯГИВАНИЕ) */
+        .nav-item.active-text svg.icon-chain {
+            animation: stretchChain 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        
+
+        @keyframes stretchChain {
+            0% { transform: scaleX(1); }
+            40% { transform: scaleX(1.6); } /* Растягивается */
+            100% { transform: scaleX(1); }  /* Возвращается в норму */
+        }
+
+        /* Остальные анимации */
         .nav-item.active-text svg.icon-gamepad {
             animation: pressGamepad 0.4s ease-in-out;
         }
         
         .nav-item.active-text svg.icon-profile {
             animation: pulseProfile 0.4s ease-in-out;
-        }
-
-        @keyframes spinGear {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(180deg); }
         }
 
         @keyframes pressGamepad {
@@ -370,7 +372,7 @@
 
     <!-- Контент -->
     <main>
-        <!-- Вкладка 1: В разработке -->
+        <!-- Вкладка 1: Рефералы -->
         <div id="tab-dev" class="tab-content">
             <div class="dev-placeholder">
                 <p>Раздел в разработке</p>
@@ -403,16 +405,21 @@
 
         <!-- Трек с кнопками -->
         <div class="nav-track">
+            <!-- Вкладка 1: РЕФЕРАЛЫ (Иконка цепи) -->
             <div class="nav-item" data-target="tab-dev" data-index="0">
-                <svg class="icon-gear" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.49-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-                <span>В разработке</span>
+                <svg class="icon-chain" viewBox="0 0 24 24">
+                    <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
+                </svg>
+                <span>Рефералы</span>
             </div>
             
+            <!-- Вкладка 2: Играть -->
             <div class="nav-item active-text" data-target="tab-play" data-index="1">
                 <svg class="icon-gamepad" viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
                 <span>Играть</span>
             </div>
             
+            <!-- Вкладка 3: Профиль -->
             <div class="nav-item" data-target="tab-profile" data-index="2">
                 <svg class="icon-profile" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                 <span>Профиль</span>
