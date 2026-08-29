@@ -110,12 +110,12 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100dvh; /* Полная высота видимого экрана */
+            height: 100dvh;
             color: rgba(255, 255, 255, 0.4);
             font-size: 1.2em;
             font-weight: 500;
             width: 100%;
-            position: absolute; /* Чтобы не зависеть от скролла */
+            position: absolute;
             top: 0;
             left: 0;
         }
@@ -145,7 +145,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px; /* Расстояние между именем и зеленой линией */
+            /* Убраны лишние отступы, юзернейм будет сразу под именем */
+            line-height: 1; 
         }
 
         .user-name {
@@ -153,22 +154,16 @@
             font-weight: 700;
             letter-spacing: 0.5px;
             text-shadow: none; 
-        }
-
-        /* Зеленая полоска под именем */
-        .green-line {
-            width: 100%;
-            height: 2px;
-            background-color: #4ade80; /* Яркий зеленый цвет */
-            border-radius: 2px;
-            box-shadow: 0 0 8px rgba(74, 222, 128, 0.6); /* Легкое свечение */
+            margin-bottom: 2px; /* Минимальный отступ до начала юзернейма */
         }
 
         .user-username {
             font-size: 1.1em;
             color: rgba(255, 255, 255, 0.6);
             font-weight: 500;
-            margin-top: 4px; /* Расстояние от зеленой линии до юзернейма */
+            /* Юзернейм начинается ровно там, где заканчивается имя */
+            margin-top: 0; 
+            padding-top: 0;
         }
 
         /* --- ПАРЯЩЕЕ МЕНЮ --- */
@@ -345,11 +340,10 @@
                 
                 <div class="user-name-wrapper">
                     <div id="profile-name" class="user-name">Загрузка...</div>
-                    <!-- Зеленая полоска -->
-                    <div class="green-line"></div>
+                    <!-- Юзернейм теперь начинается сразу здесь, без лишних элементов -->
+                    <div id="profile-username" class="user-username">@...</div>
                 </div>
                 
-                <div id="profile-username" class="user-username">@...</div>
             </div>
         </div>
     </main>
