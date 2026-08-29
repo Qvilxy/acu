@@ -25,7 +25,7 @@
             color: white;
             height: 100vh;
             width: 100vw;
-            overflow: hidden;
+            overflow: hidden; /* Убираем скролл всей страницы */
             display: flex;
             flex-direction: column;
         }
@@ -132,14 +132,15 @@
             flex-grow: 1;
             position: relative;
             overflow-y: auto;
-            padding-bottom: 120px; 
+            /* Убран padding-bottom, чтобы фон был чистым до самого низа */
             width: 100%;
+            height: 100%; /* Занимаем всю доступную высоту */
         }
 
         .tab-content {
             display: none;
             width: 100%;
-            min-height: 100%;
+            height: 100%; /* Важно для корректного отображения */
             animation: fadeIn 0.3s ease;
         }
 
@@ -175,7 +176,7 @@
             align-items: center;
             height: 100%;
             position: relative;
-            overflow: hidden; /* Важно для скрытия лишнего */
+            overflow: hidden;
         }
         
         #tab-play.active {
@@ -198,12 +199,13 @@
             display: flex;
             flex-direction: column;
             gap: 20px; /* Отступ между плитками */
-            padding: 40px 20px 60px 20px; /* УВЕЛИЧЕНЫ ОТСТУПЫ, ЧТОБЫ ТЕНЬ БЫЛА ВИДНА */
-            overflow-y: scroll; /* Разрешаем скролл */
+            /* Паддинги симметричные, чтобы первая и последняя карточка могли встать ровно по центру */
+            padding: 50% 20px 50% 20px; 
+            overflow-y: scroll;
             scroll-behavior: smooth;
-            scrollbar-width: none; /* Скрываем стандартный скроллбар */
+            scrollbar-width: none;
             -ms-overflow-style: none;
-            touch-action: pan-y; /* Разрешаем вертикальный свайп */
+            touch-action: pan-y;
             height: 100%;
         }
         
@@ -218,11 +220,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.4); /* Глубокая тень */
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
             border: 1px solid rgba(255,255,255,0.05);
             transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
             position: relative;
-            flex-shrink: 0; /* Чтобы не сжимались */
+            flex-shrink: 0;
+            /* Добавим will-change для плавности анимации размеров */
+            will-change: transform, height, opacity;
         }
 
         /* Иконка замка */
@@ -238,25 +242,31 @@
             width: 100%;
             aspect-ratio: 1 / 1; /* Строгий квадрат */
             transform: scale(1);
+            opacity: 1;
             z-index: 2;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
 
         /* МАЛЕНЬКАЯ КАРТОЧКА (Плоский прямоугольник) */
         .game-card.small {
             width: 100%;
             height: 120px; /* Фиксированная небольшая высота */
-            opacity: 0.7;
+            opacity: 0.5; /* Более прозрачные неактивные */
             transform: scale(0.9);
             z-index: 1;
+            filter: brightness(0.7);
         }
 
         /* ПОЛЗУНОК СПРАВА */
         .scroll-track-container {
-            width: 20px; /* Немного шире для удобства */
+            width: 20px;
             height: 100%;
-            position: relative;
+            position: absolute;
+            right: 0;
+            top: 0;
             display: flex;
             justify-content: center;
+            pointer-events: none; /* Чтобы не мешал свайпам */
         }
 
         .scroll-track {
@@ -272,18 +282,17 @@
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            width: 12px; /* Ширина шарика */
-            height: 12px; /* Высота шарика */
+            width: 12px;
+            height: 12px;
             background: #FCD34D;
-            border-radius: 50%; /* По умолчанию шар */
+            border-radius: 50%;
             box-shadow: 0 0 15px rgba(252, 211, 77, 0.8);
             transition: top 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), height 0.3s ease, border-radius 0.3s ease;
             z-index: 2;
         }
         
-        /* Класс для превращения в полоску при движении */
         .track-indicator.stretching {
-            height: 40px; /* Становится длинной полоской */
+            height: 40px;
             border-radius: 10px;
             background: #F59E0B;
         }
@@ -400,38 +409,15 @@
             color: #F2F2F7;
         }
 
-        /* АНИМАЦИЯ ЦЕПИ */
-        .nav-item.active-text svg.icon-chain {
-            animation: stretchChain 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
+        /* Анимации иконок */
+        .nav-item.active-text svg.icon-chain { animation: stretchChain 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes stretchChain { 0% { transform: scaleX(1); } 40% { transform: scaleX(1.6); } 100% { transform: scaleX(1); } }
 
-        @keyframes stretchChain {
-            0% { transform: scaleX(1); }
-            40% { transform: scaleX(1.6); }
-            100% { transform: scaleX(1); }
-        }
+        .nav-item.active-text svg.icon-gamepad { animation: pressGamepad 0.4s ease-in-out; }
+        @keyframes pressGamepad { 0% { transform: scaleX(1) scaleY(1); } 25% { transform: scaleX(0.85) scaleY(1.1) translateX(2px); } 50% { transform: scaleX(1) scaleY(1); } 75% { transform: scaleX(0.85) scaleY(1.1) translateX(-2px); } 100% { transform: scaleX(1) scaleY(1); } }
 
-        .nav-item.active-text svg.icon-gamepad {
-            animation: pressGamepad 0.4s ease-in-out;
-        }
-        
-        .nav-item.active-text svg.icon-profile {
-            animation: pulseProfile 0.4s ease-in-out;
-        }
-
-        @keyframes pressGamepad {
-            0% { transform: scaleX(1) scaleY(1); }
-            25% { transform: scaleX(0.85) scaleY(1.1) translateX(2px); }
-            50% { transform: scaleX(1) scaleY(1); }
-            75% { transform: scaleX(0.85) scaleY(1.1) translateX(-2px); }
-            100% { transform: scaleX(1) scaleY(1); }
-        }
-
-        @keyframes pulseProfile {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
+        .nav-item.active-text svg.icon-profile { animation: pulseProfile 0.4s ease-in-out; }
+        @keyframes pulseProfile { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
 
         /* --- ИНДИКАТОР МЕНЮ (ПЛИТКА) --- */
         .glass-pill {
@@ -794,37 +780,41 @@
 
         function renderInitialCards() {
             gamesList.innerHTML = '';
-            // Создаем бесконечный список: 3-1-2-3-1 (чтобы можно было скроллить вверх и вниз от центра)
-            // Индексы в массиве gameModes: 2, 0, 1, 2, 0
-            
-            const sequence = [2, 0, 1, 2, 0]; 
-            // Центральный элемент (индекс 2 в sequence) это currentGameIndex (0)
+            // Создаем буфер из 3 элементов: [Предыдущий, Текущий, Следующий]
+            const sequence = getSequence(currentGameIndex);
             
             sequence.forEach((modeIdx, i) => {
                 const card = createCardElement(modeIdx, i);
                 gamesList.appendChild(card);
             });
 
-            // Скроллим к центральному элементу (индекс 2)
+            // Скроллим к центральному элементу (индекс 1 в массиве из 3 элементов)
             setTimeout(() => {
-                const centerCard = gamesList.children[2];
+                const centerCard = gamesList.children[1];
                 if(centerCard) {
                     const cardHeight = centerCard.offsetHeight;
-                    const gap = 20;
                     const containerHeight = gamesList.clientHeight;
-                    // Центрируем: (containerHeight - cardHeight) / 2
+                    // Центрируем активную карточку
                     const offset = (containerHeight - cardHeight) / 2;
-                    gamesList.scrollTop = (cardHeight + gap) * 2 - offset;
+                    gamesList.scrollTop = centerCard.offsetTop - offset;
                 }
                 updateSliderState(false);
             }, 50);
+        }
+
+        // Функция получения правильного порядка карточек
+        function getSequence(activeIndex) {
+            const total = gameModes.length;
+            const prev = (activeIndex - 1 + total) % total;
+            const next = (activeIndex + 1) % total;
+            return [prev, activeIndex, next];
         }
 
         function createCardElement(modeIdx, seqIdx) {
             const div = document.createElement('div');
             div.className = 'game-card';
             div.dataset.modeIdx = modeIdx;
-            div.dataset.seqIdx = seqIdx;
+            div.dataset.seqIdx = seqIdx; // 0 - верх, 1 - центр, 2 - низ
             div.innerHTML = lockSvg;
             return div;
         }
@@ -850,47 +840,67 @@
 
             if (closestCard) {
                 const modeIdx = parseInt(closestCard.dataset.modeIdx);
-                currentGameIndex = modeIdx;
+                
+                // Обновляем глобальный индекс только если мы действительно перешли на другую карточку
+                // Это предотвращает сброс позиции при простом скролле внутри одной карточки
+                if (currentGameIndex !== modeIdx) {
+                    currentGameIndex = modeIdx;
+                    // Перерисовываем DOM, чтобы сохранить правильный порядок (бесконечность)
+                    // Но делаем это аккуратно, чтобы не сбить скролл слишком резко
+                    rebuildListSmoothly(modeIdx);
+                }
 
                 // Обновляем классы размеров
                 cards.forEach(c => {
-                    c.className = 'game-card small'; // Сначала все маленькие
+                    c.className = 'game-card small'; 
                 });
-                closestCard.className = 'game-card large'; // Активная большая
+                closestCard.className = 'game-card large'; 
 
                 // Обновляем ползунок
                 updateScrollIndicator(activeSeqIdx, animate);
             }
         }
 
+        function rebuildListSmoothly(newIndex) {
+            // Сохраняем текущую позицию скролла относительно верха контейнера
+            const currentScroll = gamesList.scrollTop;
+            
+            // Очищаем и пересоздаем
+            gamesList.innerHTML = '';
+            const sequence = getSequence(newIndex);
+            
+            sequence.forEach((modeIdx, i) => {
+                const card = createCardElement(modeIdx, i);
+                gamesList.appendChild(card);
+            });
+
+            // Возвращаем скролл так, чтобы новая центральная карточка (индекс 1) была там же, где и старая
+            // Поскольку структура идентична (3 карты), позиция центральной карты должна быть примерно той же
+            // Но лучше пересчитать центрирование
+            setTimeout(() => {
+                const centerCard = gamesList.children[1];
+                if(centerCard) {
+                    const cardHeight = centerCard.offsetHeight;
+                    const containerHeight = gamesList.clientHeight;
+                    const offset = (containerHeight - cardHeight) / 2;
+                    gamesList.scrollTop = centerCard.offsetTop - offset;
+                }
+            }, 10);
+        }
+
         function updateScrollIndicator(seqIdx, animate) {
-            // Всего точек 3. seqIdx от 0 до 4 (в нашем буфере 5 элементов)
-            // Нам нужно мапить seqIdx на 0, 1, 2
-            // Sequence: [2, 0, 1, 2, 0] -> Индексы точек: [2, 0, 1, 2, 0]
-            
-            const dotCount = 3;
             const trackHeight = document.querySelector('.scroll-track').offsetHeight;
-            const indicatorHeight = 12; // Высота шарика
+            const indicatorHeight = 12; 
             
-            // Позиции точек (примерно)
-            // Точка 0: 10%
-            // Точка 1: 50%
-            // Точка 2: 90%
+            // seqIdx: 0 (верх/предыдущий), 1 (центр/текущий), 2 (низ/следующий)
+            // Нам нужно позиционировать индикатор в зависимости от того, какая карточка АКТИВНА (центральная).
+            // Но так как мы перестраиваем список, активная карточка ВСЕГДА имеет seqIdx = 1.
+            // Поэтому позиция индикатора зависит от currentGameIndex (0, 1, 2).
             
             let percent = 0;
-            if (seqIdx === 0 || seqIdx === 3) percent = 90; // Режим 3 (Crash) - внизу или вверху цикла
-            if (seqIdx === 1 || seqIdx === 4) percent = 10; // Режим 1 (Рулетка)
-            if (seqIdx === 2) percent = 50; // Режим 2 (Сапер) - центр
-
-            // Корректируем логику для бесконечного скролла:
-            // Мы просто смотрим на currentGameIndex (0, 1, 2)
-            // 0 -> 10% (верх)
-            // 1 -> 50% (центр)
-            // 2 -> 90% (низ)
-            
-            if (currentGameIndex === 0) percent = 15;
-            if (currentGameIndex === 1) percent = 50;
-            if (currentGameIndex === 2) percent = 85;
+            if (currentGameIndex === 0) percent = 15; // Рулетка (Верх)
+            if (currentGameIndex === 1) percent = 50; // Сапер (Центр)
+            if (currentGameIndex === 2) percent = 85; // Краш (Низ)
 
             const topPos = (trackHeight - indicatorHeight) * (percent / 100);
             
@@ -899,9 +909,9 @@
 
             // Эффект Шар <-> Полоска
             if (isSliderDragging) {
-                trackIndicator.classList.add('stretching'); // Полоска
+                trackIndicator.classList.add('stretching'); 
             } else {
-                trackIndicator.classList.remove('stretching'); // Шар
+                trackIndicator.classList.remove('stretching'); 
             }
         }
 
@@ -910,13 +920,13 @@
             isSliderDragging = true;
             startY = e.touches[0].clientY;
             startScrollTop = gamesList.scrollTop;
-            gamesList.style.scrollBehavior = 'auto'; // Отключаем плавность для мгновенной реакции
-            updateSliderState(true); // Включаем растягивание индикатора
+            gamesList.style.scrollBehavior = 'auto'; 
+            updateSliderState(true); 
         }
 
         function handleTouchMove(e) {
             if (!isSliderDragging) return;
-            e.preventDefault(); // Блокируем нативный скролл браузера если нужно
+            e.preventDefault(); 
             const deltaY = startY - e.touches[0].clientY;
             gamesList.scrollTop = startScrollTop + deltaY;
             updateSliderState(true);
@@ -950,10 +960,9 @@
         }
 
         function snapToNearest() {
-            gamesList.style.scrollBehavior = 'smooth'; // Включаем плавность для магнита
-            updateSliderState(true); // Возвращаем индикатор в шар
+            gamesList.style.scrollBehavior = 'smooth'; 
+            updateSliderState(true); 
             
-            // Небольшая задержка, чтобы CSS успел переключиться на smooth перед изменением scrollTop
             setTimeout(() => {
                 const cards = Array.from(gamesList.children);
                 let closestCard = null;
@@ -979,13 +988,12 @@
         function startAutoSwitch() {
             if (autoSwitchInterval) clearInterval(autoSwitchInterval);
             autoSwitchInterval = setInterval(() => {
-                if (currentIndex === 1 && !isSliderDragging) { // Только если на вкладке Играть и не трогают руками
-                    // Скроллим вниз к следующему
+                if (currentIndex === 1 && !isSliderDragging) { 
                     gamesList.style.scrollBehavior = 'smooth';
-                    gamesList.scrollTop += (gamesList.children[0].offsetHeight + 20);
+                    // Скроллим вниз на высоту карточки + отступ
+                    const cardHeight = gamesList.children[0] ? gamesList.children[0].offsetHeight : 200;
+                    gamesList.scrollTop += (cardHeight + 20);
                     
-                    // Проверка на конец списка для "бесконечности" (упрощенная)
-                    // В реальном проекте здесь лучше переставлять DOM элементы, но для 3 элементов достаточно скролла
                     setTimeout(() => {
                          updateSliderState(true);
                     }, 400);
