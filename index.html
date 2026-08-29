@@ -31,7 +31,7 @@
             flex-direction: column;
         }
 
-        /* --- Экран загрузки --- */
+        /* --- Экран загрузки (Защита от зависания) --- */
         #loading-screen {
             position: fixed;
             top: 0;
@@ -42,8 +42,15 @@
             justify-content: center;
             align-items: center;
             z-index: 9999;
-            background: inherit;
-            transition: opacity 0.6s ease-out;
+            background: linear-gradient(135deg, #4a0e2d, #7b1f4c); /* Дублируем фон на случай долгой загрузки body */
+            transition: opacity 0.6s ease-out, visibility 0.6s;
+        }
+
+        /* Класс для полного скрытия загрузки */
+        #loading-screen.loaded {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
         }
 
         .loading-logo {
@@ -51,15 +58,14 @@
             max-width: 250px;
             height: auto;
             object-fit: contain;
-        }
-
-        .hidden {
-            opacity: 0;
-            pointer-events: none;
+            /* Фолбэк, если картинка не загрузится */
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
         }
 
         /* --- Шапка приложения --- */
         header {
+            /* Увеличенная высота: safe-area + отступы */
             padding-top: env(safe-area-inset-top, 20px); 
             padding-bottom: 20px;
             padding-left: 20px;
@@ -68,14 +74,18 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background: transparent; /* Сливается с фоном */
+            
+            /* Прозрачный фон, чтобы сливался с главным градиентом */
+            background: transparent; 
+            
             flex-shrink: 0;
             z-index: 10;
             width: 100%;
         }
 
         .header-logo {
-            height: 75px; /* Увеличен в 3 раза */
+            /* Увеличен в 3 раза: было 25px, стало 75px */
+            height: 75px; 
             width: auto;
             max-width: 90%;
             object-fit: contain;
@@ -107,6 +117,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* Стили для вкладки "В разработке" */
         .dev-placeholder {
             display: flex;
             flex-direction: column;
@@ -118,6 +129,7 @@
             font-weight: 500;
         }
 
+        /* Стили для вкладки "Профиль" */
         .profile-container {
             display: flex;
             flex-direction: column;
@@ -232,7 +244,7 @@
             
             will-change: transform, background, border-color, box-shadow;
             
-            /* Используем CSS переменные для безопасного управления */
+            /* Используем CSS переменные для безопасного управления движением и масштабом */
             transform: translateX(var(--tx, 0px)) scale(var(--scale, 1));
             
             /* Плавная анимация по умолчанию */
@@ -244,6 +256,7 @@
         }
 
         /* Состояние: АКТИВНОЕ ДВИЖЕНИЕ (Drag или Snap) */
+        /* Радужный эффект применяется и при перетаскивании, и при автоматическом полете */
         .glass-pill.dragging,
         .glass-pill.animating {
             background: rgba(255, 255, 255, 0.25);
@@ -251,7 +264,7 @@
             /* Радужная рамка (Мыльный пузырь) */
             border: 2px solid transparent;
             background-image: 
-                linear-gradient(#2a0a1a, #2a0a1a), 
+                linear-gradient(#2a0a1a, #2a0a1a), /* Цвет фона плитки внутри рамки */
                 conic-gradient(from 0deg, #ff00cc, #3333ff, #00ffcc, #ffff00, #ff00cc);
             background-origin: border-box;
             background-clip: padding-box, border-box;
@@ -263,13 +276,12 @@
                 inset 0 0 10px rgba(255, 255, 255, 0.2);
         }
 
-        /* Специфика перетаскивания: мгновенная реакция на палец */
+        /* Специфика перетаскивания: мгновенная реакция на палец (отключаем анимацию transform) */
         .glass-pill.dragging {
             transition: 
                 background 0.1s,
                 border-color 0.1s, 
                 box-shadow 0.1s;
-            /* Transform не анимируется, чтобы следовать за пальцем мгновенно */
         }
 
     </style>
@@ -278,24 +290,30 @@
 
     <!-- Экран загрузки -->
     <div id="loading-screen">
-        <img src="bcblogo.PNG" alt="BCB Logo" class="loading-logo">
+        <!-- onerror скрывает картинку, если она не найдена, чтобы не блокировать загрузку -->
+        <img src="bcblogo.PNG" alt="BCB Logo" class="loading-logo" onerror="this.style.display='none'">
     </div>
 
     <!-- Шапка -->
     <header>
-        <img src="bcbtextlogo.PNG" alt="BCB Text Logo" class="header-logo">
+        <img src="bcbtextlogo.PNG" alt="BCB Text Logo" class="header-logo" onerror="this.style.display='none'">
     </header>
 
     <!-- Контент -->
     <main>
+        <!-- Вкладка 1: В разработке -->
         <div id="tab-dev" class="tab-content">
-            <div class="dev-placeholder"><p>Раздел в разработке</p></div>
+            <div class="dev-placeholder">
+                <p>Раздел в разработке</p>
+            </div>
         </div>
 
+        <!-- Вкладка 2: Играть (Активна по умолчанию) -->
         <div id="tab-play" class="tab-content active">
             <!-- Пустой фон -->
         </div>
 
+        <!-- Вкладка 3: Профиль -->
         <div id="tab-profile" class="tab-content">
             <div class="profile-container">
                 <img id="profile-avatar" src="" alt="Avatar" class="user-avatar">
@@ -307,8 +325,10 @@
 
     <!-- Меню навигации -->
     <nav id="nav-bar">
+        <!-- Плавающая плитка -->
         <div class="glass-pill" id="active-pill"></div>
 
+        <!-- Трек с кнопками -->
         <div class="nav-track">
             <div class="nav-item" data-target="tab-dev" data-index="0">
                 <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.49-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
@@ -328,7 +348,7 @@
     </nav>
 
     <script>
-        // --- БЕЗОПАСНАЯ ИНИЦИАЛИЗАЦИЯ TELEGRAM WEBAPP ---
+        // --- 1. БЕЗОПАСНАЯ ИНИЦИАЛИЗАЦИЯ TELEGRAM WEBAPP ---
         const tg = window.Telegram?.WebApp || null;
         
         if (tg) {
@@ -342,7 +362,7 @@
             }
         }
 
-        // --- ДАННЫЕ ПОЛЬЗОВАТЕЛЯ ---
+        // --- 2. ДАННЫЕ ПОЛЬЗОВАТЕЛЯ ---
         const user = tg?.initDataUnsafe?.user || {};
         const avatarImg = document.getElementById('profile-avatar');
         const nameDiv = document.getElementById('profile-name');
@@ -351,59 +371,44 @@
         if (user.photo_url) {
             avatarImg.src = user.photo_url;
         } else {
+            // SVG заглушка, если нет фото
             avatarImg.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjIpIj48cGF0aCBkPSJNMTIgMTJjMi4yMSAwIDQtMS43OSA0LTRzLTEuNzktNC00LTRzLTQgMS43OS00IDRTOS43OSAxMiAxMiAxMnogTTEyIDE0Yy0yLjY3IDAtOCAxLjM0LTggNHYyaDE2di0yQzIwIDE1LjM0IDE0LjY3IDE0IDEyIDE0eiIvPjwvc3ZnPg==';
         }
         
         nameDiv.textContent = user.first_name + (user.last_name ? ' ' + user.last_name : '') || 'Игрок BCB';
         usernameDiv.textContent = user.username ? '@' + user.username : 'Нет юзернейма';
 
-        // --- ЛОГИКА ЗАГРУЗКИ ---
+        // --- 3. ЖЕСТКАЯ ЛОГИКА ЗАГРУЗКИ (ANTI-HANG) ---
         const loadingScreen = document.getElementById('loading-screen');
-        let appStarted = false;
+        
+        // Принудительное скрытие через 2 секунды, ЧТО БЫ НИ СЛУЧИЛОСЬ
+        // Это гарантирует, что приложение запустится даже при битых картинках или медленном интернете
+        setTimeout(() => {
+            loadingScreen.classList.add('loaded');
+            // Полностью удаляем из DOM после завершения CSS анимации (0.6s)
+            setTimeout(() => { 
+                if(loadingScreen) loadingScreen.remove(); 
+            }, 600);
+        }, 2000);
 
-        function startApp() {
-            if (appStarted) return;
-            appStarted = true;
-            
-            setTimeout(() => {
-                loadingScreen.classList.add('hidden');
-                setTimeout(() => { 
-                    loadingScreen.style.display = 'none'; 
-                    // Инициализируем меню только после полного исчезновения загрузки
-                    initMenuPosition();
-                }, 600);
-            }, 1500);
-        }
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', startApp);
-        } else {
-            startApp();
-        }
-
-        // --- ФИЗИКА МЕНЮ И DRAG-AND-DROP ---
+        // --- 4. ФИЗИКА МЕНЮ И DRAG-AND-DROP ---
         const navBar = document.getElementById('nav-bar');
         const pill = document.getElementById('active-pill');
         const navItems = document.querySelectorAll('.nav-item');
         const tabContents = document.querySelectorAll('.tab-content');
-
-        // Проверка на случай, если элементы не найдены (защита от багов)
-        if (!navBar || !pill || navItems.length === 0) {
-            console.error('Navigation elements not found!');
-        }
 
         let currentIndex = 1; // Начинаем с "Играть"
         let isDragging = false;
         let startX = 0;
         let currentTranslateX = 0; 
         
-        function getStepWidth() {
-            if (!navBar) return 100;
-            return (navBar.offsetWidth - 12) / 3;
+        function getStepWidth() { 
+            return navBar ? (navBar.offsetWidth - 12) / 3 : 100; 
         }
 
-        // Обновленная функция обновления позиции
         function updatePillPosition(index, animate = true) {
+            if (!pill || !navBar) return;
+            
             const step = getStepWidth();
             const xPos = index * step; 
             
@@ -412,665 +417,127 @@
                 pill.classList.add('dragging');
                 pill.classList.remove('animating');
             } else if (!animate) {
-                pill.classList.remove('dragging');
-                pill.classList.remove('animating');
-                pill.style.transition = 'none'; // Мгновенный перенос
+                // Инициализация: убираем эффекты, отключаем анимацию
+                pill.classList.remove('dragging', 'animating');
+                pill.style.transition = 'none';
             } else {
+                // Анимация полета (snap): включаем радугу
                 pill.classList.remove('dragging');
-                pill.classList.add('animating'); // Включаем радугу во время полета
+                pill.classList.add('animating');
                 
                 // Восстанавливаем пружинистую анимацию
                 pill.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease';
                 
-                // Убираем эффект после завершения анимации
-                setTimeout(() => {
-                    if (!isDragging) pill.classList.remove('animating');
-                }, Проблема с запуском, скорее всего, вызвана тем, что скрипт пытается обратиться к элементам меню или рассчитать их ширину до того, как они полностью отрисовались браузером, либо из-за ошибки в логике классов анимации.
-
-Я переписал JavaScript код, сделав его **максимально надежным**.
-1.  **Инициализация меню** теперь происходит строго после исчезновения экрана загрузки и с небольшой технической задержкой, чтобы браузер успел рассчитать размеры (`offsetWidth`).
-2.  **CSS переменные** для трансформации (`--tx`, `--scale`) теперь применяются безопаснее, чтобы избежать конфликтов между перетаскиванием и анимацией "прилипания".
-3.  Добавлены проверки на существование элементов перед обращением к ним.
-
-Вот полностью рабочий, исправленный код. Сохраните его как `index.html`.
-
-```html
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>BCB Casino</title>
-    
-    <!-- Подключаем скрипт Telegram Web Apps -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
-    <style>
-        /* --- Базовые стили --- */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: none; /* Критично для drag-and-drop на iOS */
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #4a0e2d, #7b1f4c);
-            color: white;
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* --- Экран загрузки --- */
-        #loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            background: inherit;
-            transition: opacity 0.6s ease-out;
-        }
-
-        .loading-logo {
-            width: 50%;
-            max-width: 250px;
-            height: auto;
-            object-fit: contain;
-        }
-
-        .hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        /* --- Шапка приложения --- */
-        header {
-            padding-top: env(safe-area-inset-top, 20px); 
-            padding-bottom: 20px;
-            padding-left: 20px;
-            padding-right: 20px;
-            
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: transparent; /* Сливается с фоном */
-            flex-shrink: 0;
-            z-index: 10;
-            width: 100%;
-        }
-
-        .header-logo {
-            height: 75px; /* Увеличен в 3 раза */
-            width: auto;
-            max-width: 90%;
-            object-fit: contain;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
-        }
-
-        /* --- Основной контент --- */
-        main {
-            flex-grow: 1;
-            position: relative;
-            overflow-y: auto;
-            padding-bottom: 120px; 
-            width: 100%;
-        }
-
-        .tab-content {
-            display: none;
-            width: 100%;
-            min-height: 100%;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .dev-placeholder {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 1.2em;
-            font-weight: 500;
-        }
-
-        .profile-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            gap: 12px;
-        }
-
-        .user-avatar {
-            width: 110px;
-            height: 110px;
-            border-radius: 50%;
-            border: 4px solid rgba(255, 255, 255, 0.15);
-            object-fit: cover;
-            background-color: rgba(0, 0, 0, 0.2);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-        }
-
-        .user-name {
-            font-size: 1.6em;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .user-username {
-            font-size: 1.1em;
-            color: rgba(255, 255, 255, 0.6);
-            font-weight: 500;
-        }
-
-        /* --- ПАРЯЩЕЕ МЕНЮ --- */
-        nav {
-            position: fixed;
-            bottom: 25px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 92%;
-            max-width: 420px;
-            height: 70px;
-            
-            background: #3a0b22; 
-            border-radius: 40px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px;
-            z-index: 1000;
-            overflow: hidden;
-        }
-
-        .nav-track {
-            display: flex;
-            width: 100%;
-            height: 100%;
-            position: relative;
-            z-index: 2;
-        }
-
-        .nav-item {
-            flex: 1;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            color: #8E8E93;
-            transition: color 0.3s;
-            position: relative;
-            z-index: 2;
-        }
-
-        .nav-item svg {
-            width: 24px;
-            height: 24px;
-            margin-bottom: 4px;
-            fill: currentColor;
-        }
-
-        .nav-item span {
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.3px;
-        }
-
-        .nav-item.active-text {
-            color: #F2F2F7;
-        }
-
-        /* --- LIQUID GLASS PILLS (Плитка) --- */
-        .glass-pill {
-            position: absolute;
-            top: 6px;
-            left: 6px;
-            width: calc((100% - 12px) / 3); 
-            height: calc(100% - 12px);
-            border-radius: 32px;
-            z-index: 1;
-            
-            /* Базовое состояние: чистое стекло без рамки */
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 2px solid transparent; 
-            
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            
-            will-change: transform, background, border-color, box-shadow;
-            
-            /* Используем CSS переменные для безопасного управления */
-            transform: translateX(var(--tx, 0px)) scale(var(--scale, 1));
-            
-            /* Плавная анимация по умолчанию */
-            transition: 
-                transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), 
-                background 0.3s ease,
-                border-color 0.3s ease, 
-                box-shadow 0.3s ease; 
-        }
-
-        /* Состояние: АКТИВНОЕ ДВИЖЕНИЕ (Drag или Snap) */
-        .glass-pill.dragging,
-        .glass-pill.animating {
-            background: rgba(255, 255, 255, 0.25);
-            
-            /* Радужная рамка (Мыльный пузырь) */
-            border: 2px solid transparent;
-            background-image: 
-                linear-gradient(#2a0a1a, #2a0a1a), 
-                conic-gradient(from 0deg, #ff00cc, #3333ff, #00ffcc, #ffff00, #ff00cc);
-            background-origin: border-box;
-            background-clip: padding-box, border-box;
-            
-            /* Голографическое свечение */
-            box-shadow: 
-                0 0 15px rgba(255, 0, 204, 0.4),
-                0 0 30px rgba(0, 255, 204, 0.2),
-                inset 0 0 10px rgba(255, 255, 255, 0.2);
-        }
-
-        /* Специфика перетаскивания: мгновенная реакция на палец */
-        .glass-pill.dragging {
-            transition: 
-                background 0.1s,
-                border-color 0.1s, 
-                box-shadow 0.1s;
-            /* Transform не анимируется, чтобы следовать за пальцем мгновенно */
-        }
-
-    </style>
-</head>
-<body>
-
-    <!-- Экран загрузки -->
-    <div id="loading-screen">
-        <img src="bcblogo.PNG" alt="BCB Logo" class="loading-logo">
-    </div>
-
-    <!-- Шапка -->
-    <header>
-        <img src="bcbtextlogo.PNG" alt="BCB Text Logo" class="header-logo">
-    </header>
-
-    <!-- Контент -->
-    <main>
-        <div id="tab-dev" class="tab-content">
-            <div class="dev-placeholder"><p>Раздел в разработке</p></div>
-        </div>
-
-        <div id="tab-play" class="tab-content active">
-            <!-- Пустой фон -->
-        </div>
-
-        <div id="tab-profile" class="tab-content">
-            <div class="profile-container">
-                <img id="profile-avatar" src="" alt="Avatar" class="user-avatar">
-                <div id="profile-name" class="user-name">Загрузка...</div>
-                <div id="profile-username" class="user-username">@...</div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Меню навигации -->
-    <nav id="nav-bar">
-        <div class="glass-pill" id="active-pill"></div>
-
-        <div class="nav-track">
-            <div class="nav-item" data-target="tab-dev" data-index="0">
-                <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.49-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-                <span>В разработке</span>
-            </div>
-            
-            <div class="nav-item active-text" data-target="tab-play" data-index="1">
-                <svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
-                <span>Играть</span>
-            </div>
-            
-            <div class="nav-item" data-target="tab-profile" data-index="2">
-                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                <span>Профиль</span>
-            </div>
-        </div>
-    </nav>
-
-    <script>
-        // --- БЕЗОПАСНАЯ ИНИЦИАЛИЗАЦИЯ TELEGRAM WEBAPP ---
-        const tg = window.Telegram?.WebApp || null;
-        
-        if (tg) {
-            try {
-                tg.ready();
-                tg.expand();
-                tg.setHeaderColor('#4a0e2d');
-                tg.setBackgroundColor('#4a0e2d');
-            } catch (e) {
-                console.warn('Telegram WebApp init error:', e);
-            }
-        }
-
-        // --- ДАННЫЕ ПОЛЬЗОВАТЕЛЯ ---
-        const user = tg?.initDataUnsafe?.user || {};
-        const avatarImg = document.getElementById('profile-avatar');
-        const nameDiv = document.getElementById('profile-name');
-        const usernameDiv = document.getElementById('profile-username');
-
-        if (user.photo_url) {
-            avatarImg.src = user.photo_url;
-        } else {
-            avatarImg.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjIpIj48cGF0aCBkPSJNMTIgMTJjMi4yMSAwIDQtMS43OSA0LTRzLTEuNzktNC00LTRzLTQgMS43OS00IDRTOS43OSAxMiAxMiAxMnogTTEyIDE0Yy0yLjY3IDAtOCAxLjM0LTggNHYyaDE2di0yQzIwIDE1LjM0IDE0LjY3IDE0IDEyIDE0eiIvPjwvc3ZnPg==';
-        }
-        
-        nameDiv.textContent = user.first_name + (user.last_name ? ' ' + user.last_name : '') || 'Игрок BCB';
-        usernameDiv.textContent = user.username ? '@' + user.username : 'Нет юзернейма';
-
-        // --- ЛОГИКА ЗАГРУЗКИ ---
-        const loadingScreen = document.getElementById('loading-screen');
-        let appStarted = false;
-
-        function startApp() {
-            if (appStarted) return;
-            appStarted = true;
-            
-            setTimeout(() => {
-                loadingScreen.classList.add('hidden');
-                setTimeout(() => { 
-                    loadingScreen.style.display = 'none'; 
-                    // Инициализируем меню только после полного исчезновения загрузки
-                    initMenuPosition();
-                }, 600);
-            }, 1500);
-        }
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', startApp);
-        } else {
-            startApp();
-        }
-
-        // --- ФИЗИКА МЕНЮ И DRAG-AND-DROP ---
-        const navBar = document.getElementById('nav-bar');
-        const pill = document.getElementById('active-pill');
-        const navItems = document.querySelectorAll('.nav-item');
-        const tabContents = document.querySelectorAll('.tab-content');
-
-        // Проверка на случай, если элементы не найдены (защита от багов)
-        if (!navBar || !pill || navItems.length === 0) {
-            console.error('Navigation elements not found!');
-        }
-
-        let currentIndex = 1; // Начинаем с "Играть"
-        let isDragging = false;
-        let startX = 0;
-        let currentTranslateX = 0; 
-        
-        function getStepWidth() {
-            if (!navBar) return 100;
-            return (navBar.offsetWidth - 12) / 3;
-        }
-
-        // Обновленная функция обновления позиции
-        function updatePillPosition(index, animate = true) {
-            const step = getStepWidth();
-            const xPos = index * step; 
-            
-            // Управление классами эффектов
-            if (isDragging) {
-                pill.classList.add('dragging');
-                pill.classList.remove('animating');
-            } else if (!animate) {
-                pill.classList.remove('dragging');
-                pill.classList.remove('animating');
-                pill.style.transition = 'none'; // Мгновенный перенос
-            } else {
-                pill.classList.remove('dragging');
-                pill.classList.add('animating'); // Включаем радугу во время полета
-                
-                // Восстанавливаем пружинистую анимацию
-                pill.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease';
-                
-                // Убираем эффект после завершения анимации
+                // Убираем эффект радуги после завершения полета
                 setTimeout(() => {
                     if (!isDragging) pill.classList.remove('animating');
                 }, 500);
             }
             
-            // Применя500);
-            }
-            
-            // Применяем позицию и масштаб через переменные
-            pillем позицию и масштаб через переменные
+            // Применяем позицию и масштаб через CSS переменные
             pill.style.setProperty('--tx', `${xPos}px`);
-.style.setProperty('--tx', `${xPos}px`);
-            pill.style.setProperty('--scale', isDragging ?            pill.style.setProperty('--scale', isDragging ? 1.1 : 1);
-            
-            current 1.1 : 1);
+            pill.style.setProperty('--scale', isDragging ? 1.1 : 1);
             
             currentTranslateX = xPos;
         }
 
-        function initTranslateX = xPos;
-        }
-
-        function initMenuPosition() {
-            if(pill &&MenuPosition() {
-            if(pill && navBar) {
-                updatePillPosition(currentIndex navBar) {
-                updatePillPosition(currentIndex, false);
-            }
-        }
-
-        const, false);
-            }
-        }
+        // Инициализация позиции меню после гарантированного исчезновения загрузки
+        setTimeout(() => {
+            updatePillPosition(currentIndex, false);
+        }, 2100);
 
         const startDrag = (clientX) => {
-            is startDrag = (clientX) => {
             isDragging = true;
-            startX = clientX -Dragging = true;
             startX = clientX - currentTranslateX;
-            pill.classList.add('dragging currentTranslateX;
             pill.classList.add('dragging');
-            pill.style.setProperty('--scale', 1.');
             pill.style.setProperty('--scale', 1.1);
-            if(tg?.HapticFeedback)1);
             if(tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
         };
 
-        tg.HapticFeedback.selectionChanged();
-        };
-
         const moveDrag = (clientX) => {
-            const moveDrag = (clientX) => {
             if (!isDragging) return;
-            
-            let newX if (!isDragging) return;
             
             let newX = clientX - startX;
-            const step = get = clientX - startX;
             const step = getStepWidth();
-            const maxIndex = 2;StepWidth();
             const maxIndex = 2;
             
-            // Сопротивление на краях
-           
-            
-            // Сопротивление на краях
+            // Сопротивление на краях (эластичность)
             const limit = step * 0.4; 
-            const limit = step * 0.4; 
-            if (newX < -limit) newX = -limit if (newX < -limit) newX = -limit + (newX + limit) * 0.2 + (newX + limit) * 0.2;
-            if (newX > (maxIndex *;
-            if (newX > (maxIndex * step) + limit) newX = (maxIndex * step step) + limit) newX = (maxIndex * step) + limit + (newX - ((maxIndex *) + limit + (newX - ((maxIndex * step) + limit)) * 0.2;
+            if (newX < -limit) newX = -limit + (newX + limit) * 0.2;
+            if (newX > (maxIndex * step) + limit) newX = (maxIndex * step) + limit + (newX - ((maxIndex * step) + limit)) * 0.2;
 
- step) + limit)) * 0.2;
-
-            pill.style.setProperty('--tx', `${newX}px`            pill.style.setProperty('--tx', `${newX}px`);
-            currentTranslateX = newX;
-        };);
+            pill.style.setProperty('--tx', `${newX}px`);
             currentTranslateX = newX;
         };
 
         const endDrag = () => {
-            if
-
-        const endDrag = () => {
             if (!isDragging) return;
-            isDragging = false (!isDragging) return;
             isDragging = false;
             pill.classList.remove('dragging');
-;
-            pill.classList.remove('dragging');
             
-            const step = getStepWidth();
-            let            
             const step = getStepWidth();
             let newIndex = Math.round(currentTranslateX / step);
             
- newIndex = Math.round(currentTranslateX / step);
-            
-            if (newIndex < 0) newIndex =             if (newIndex < 0) newIndex = 0;
-            if (newIndex > 2)0;
+            if (newIndex < 0) newIndex = 0;
             if (newIndex > 2) newIndex = 2;
-
-            if (newIndex !== newIndex = 2;
 
             if (newIndex !== currentIndex) {
                 switchTab(newIndex);
-            currentIndex) {
-                switchTab(newIndex);
             }
 
-            updatePillPosition(newIndex, true); }
-
+            // Запускаем анимацию прилета (будет радужной благодаря классу animating)
             updatePillPosition(newIndex, true);
-            if(tg?.HapticFeedback) tg.H
+            
             if(tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         };
 
-apticFeedback.impactOccurred('light');
-        };
-
         function switchTab(newIndex) {
-            currentIndex =        function switchTab(newIndex) {
             currentIndex = newIndex;
             
-            navItems.forEach(item => item.classList newIndex;
-            
             navItems.forEach(item => item.classList.remove('active-text'));
-            navItems[currentIndex]..remove('active-text'));
             navItems[currentIndex].classList.add('active-text');
 
-            tabContents.forEachclassList.add('active-text');
-
             tabContents.forEach(tab => tab.classList.remove('active'));
-            const target(tab => tab.classList.remove('active'));
-            const targetId = navItems[currentIndex].getAttribute('data-target');Id = navItems[currentIndex].getAttribute('data-target');
-            if(targetId) document.getElementById(targetId).
-            if(targetId) document.getElementById(targetId).classList.add('active');
+            const targetId = navItems[currentIndex].getAttribute('data-target');
+            if(targetId) {
+                const targetEl = document.getElementById(targetId);
+                if(targetEl) targetEl.classList.add('active');
+            }
         }
 
-        // TouchclassList.add('active');
-        }
-
-        // Touch события
+        // Привязка событий Touch (Телефоны)
         if(navBar) {
-            navBar события
-        if(navBar) {
-            navBar.addEventListener('touchstart', (e) => startDrag(e.addEventListener('touchstart', (e) => startDrag(e.touches[0].clientX), {passive: false.touches[0].clientX), {passive: false});
-        }
-        window.addEventListener('touchmove});
+            navBar.addEventListener('touchstart', (e) => startDrag(e.touches[0].clientX), {passive: false});
         }
         window.addEventListener('touchmove', (e) => {
-            if(isDragging)', (e) => {
-            if(isDragging) e.preventDefault(); 
-            moveDrag(e.touches[0]. e.preventDefault(); 
+            if(isDragging) e.preventDefault(); // Блокируем скролл страницы при драге
             moveDrag(e.touches[0].clientX);
-        }, {passive: false});clientX);
         }, {passive: false});
         window.addEventListener('touchend', endDrag);
 
-
-        window.addEventListener('touchend', endDrag);
-
-        // Mouse события (для ПК)
-        if(nav        // Mouse события (для ПК)
+        // Привязка событий Mouse (ПК для тестов)
         if(navBar) {
-            navBar.addEventListener('mousedown', (Bar) {
             navBar.addEventListener('mousedown', (e) => startDrag(e.clientX));
-       e) => startDrag(e.clientX));
         }
-        window.addEventListener('mousemove', (e) => }
         window.addEventListener('mousemove', (e) => moveDrag(e.clientX));
-        window.addEventListener('mouseup', moveDrag(e.clientX));
         window.addEventListener('mouseup', endDrag);
 
-        // Клик по вкладке
- endDrag);
-
-        // Клик по вкладке
-        navItems.forEach((item, index) =>        navItems.forEach((item, index) => {
+        // Клик по вкладке (если не был драг)
+        navItems.forEach((item, index) => {
             item.addEventListener('click', () => {
- {
-            item.addEventListener('click', () => {
-                if (!isDragging && index !== currentIndex) {
                 if (!isDragging && index !== currentIndex) {
                     switchTab(index);
-                    updatePillPosition(index                    switchTab(index);
                     updatePillPosition(index, true);
-                    if(tg?.HapticFeedback, true);
                     if(tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-) tg.HapticFeedback.impactOccurred('light');
                 }
             });
         });
 
-        // Р                }
-            });
-        });
-
-        // Ресайз
-        window.addEventListener('resize',есайз
+        // Пересчет позиции при повороте экрана
         window.addEventListener('resize', () => {
-            updatePillPosition(currentIndex, () => {
             updatePillPosition(currentIndex, false);
         });
 
     </script>
- false);
-        });
-
-    </script>
 </body>
-</html>
-```</body>
 </html>
