@@ -80,26 +80,26 @@
             filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
         }
 
-        /* --- НОВЫЙ ДИЗАЙН БАЛАНСА (ТОЧНО КАК НА ФОТО) --- */
+        /* --- БАЛАНС (ОПУЩЕННЫЙ И С ВИШНЕЙ) --- */
         .balance-pill {
             position: absolute;
-            /* ПОЗИЦИЯ: Поднято выше (+28px вместо +39px), чтобы быть на уровне кнопок меню */
-            top: calc(env(safe-area-inset-top, 20px) + 28px); 
+            /* ПОЗИЦИЯ: ОПУЩЕНО НИЖЕ ИНТЕРФЕЙСА TELEGRAM (+52px отступа сверху) */
+            top: calc(env(safe-area-inset-top, 20px) + 52px); 
             right: 16px; 
             
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 5px; /* Чуть меньше отступ для компактности */
+            gap: 6px; 
             
-            /* РАЗМЕРЫ: Максимально компактные, как на референсе */
-            height: 28px; 
-            min-width: 54px; 
+            /* РАЗМЕРЫ: Немного увеличена высота, чтобы вместить большую вишню */
+            height: 36px; 
+            min-width: 60px; 
             width: auto; 
-            padding: 0 10px; 
+            padding: 0 12px; 
             
             background: linear-gradient(180deg, #FCD34D 0%, #F59E0B 100%);
-            border-radius: 14px; /* Полное скругление для высоты 28px */
+            border-radius: 18px; 
             box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.2);
             
@@ -115,7 +115,7 @@
         }
 
         .balance-text {
-            font-size: 13px; /* Размер шрифта под высоту 28px */
+            font-size: 15px; 
             font-weight: 700;
             color: #fff;
             text-shadow: 0 1px 2px rgba(0,0,0,0.1);
@@ -123,13 +123,14 @@
             white-space: nowrap; 
         }
 
-        /* ИКОНКА ЗВЕЗДЫ: Пропорциональна новой маленькой таблетке */
+        /* ИКОНКА ВИШНИ: УВЕЛИЧЕНА В 1.8 РАЗА (было 16px -> стало ~29px) */
         .balance-star-img {
-            height: 16px; 
+            height: 29px; 
             width: auto;
             object-fit: contain;
             display: block;
-            margin-bottom: 1px; /* Визуальная коррекция центра */
+            /* Небольшая коррекция, чтобы визуально стояла ровно по центру с текстом */
+            margin-bottom: 2px; 
         }
 
         /* --- Основной контент --- */
@@ -366,11 +367,11 @@
     <header>
         <img src="bcblogotext.PNG" alt="BCB Text Logo" class="header-logo" onerror="this.style.display='none'">
         
-        <!-- Обновленная таблетка баланса (маленькая) -->
+        <!-- Обновленная таблетка баланса (опущена вниз, большая вишня) -->
         <div class="balance-pill" id="balance-pill">
             <span class="balance-text">0</span>
-            <!-- Иконка звезды пропорциональна размеру -->
-            <img src="iconcherry.PNG" alt="★" class="balance-star-img" onerror="this.style.display='none'">
+            <!-- Имя файла изменено на iconcherry.PNG, размер увеличен -->
+            <img src="iconcherry.PNG" alt="🍒" class="balance-star-img" onerror="this.style.display='none'">
         </div>
     </header>
 
