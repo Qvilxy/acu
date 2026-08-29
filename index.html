@@ -8,123 +8,314 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
     <style>
-        /* Сброс стилей и базовые настройки */
+        /* --- Базовые стили --- */
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent; /* Убирает синюю подсветку при нажатии на мобильных */
         }
 
         body {
-            margin: 0;
-            padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            /* Градиентный фон (темно-бордовый/фиолетовый) */
             background: linear-gradient(135deg, #4a0e2d, #7b1f4c);
             color: white;
             height: 100vh;
             width: 100vw;
-            overflow: hidden; /* Запрещаем прокрутку */
-            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         /* --- Экран загрузки --- */
         #loading-screen {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             display: flex;
-            justify-content: center; /* Центр по горизонтали */
-            align-items: center;     /* Центр по вертикали */
-            z-index: 100;
-            background: inherit;     /* Наследуем градиент фона */
-            transition: opacity 0.6s ease-out; /* Плавное исчезновение */
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            background: inherit;
+            transition: opacity 0.6s ease-out;
         }
 
         .loading-logo {
-            width: 50%;              /* Размер логотипа относительно экрана */
-            max-width: 250px;        /* Максимальный размер */
+            width: 50%;
+            max-width: 250px;
             height: auto;
             object-fit: contain;
-            /* Анимация убрана, логотип статичен */
         }
 
-        /* Класс для скрытия экрана загрузки */
         .hidden {
             opacity: 0;
             pointer-events: none;
         }
 
-        /* --- Основной интерфейс --- */
-        #app-interface {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            /* Интерфейс полностью пустой, виден только фон body */
-            display: none; 
-            opacity: 0;
-            transition: opacity 0.6s ease-in;
+        /* --- Шапка приложения --- */
+        header {
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 20px;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
         }
 
-        /* Класс для плавного появления интерфейса */
-        .visible {
-            display: block !important;
-            opacity: 1 !important;
+        .header-logo {
+            height: 30px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        /* --- Основной контент --- */
+        main {
+            flex-grow: 1;
+            position: relative;
+            overflow-y: auto;
+            padding-bottom: 80px; /* Отступ под нижнее меню */
+        }
+
+        .tab-content {
+            display: none;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            text-align: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Стили для вкладки "Играть" */
+        .play-placeholder {
+            font-size: 1.2em;
+            opacity: 0.7;
+        }
+
+        /* Стили для вкладки "Профиль" */
+        .profile-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            object-fit: cover;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .user-name {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .user-username {
+            font-size: 1em;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: normal;
+        }
+
+        /* --- Нижняя навигация --- */
+        nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            background: rgba(20, 5, 15, 0.9);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 100;
+            padding-bottom: env(safe-area-inset-bottom); /* Для iPhone с челкой */
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.75em;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 33%;
+            height: 100%;
+        }
+
+        .nav-item svg {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+            fill: currentColor;
+        }
+
+        .nav-item.active {
+            color: #ff6b9d; /* Акцентный цвет для активной вкладки */
+        }
+        
+        .nav-item.disabled {
+            opacity: 0.3;
+            pointer-events: none;
         }
 
     </style>
 </head>
 <body>
 
-    <!-- Экран загрузки: только логотип по центру -->
+    <!-- Экран загрузки -->
     <div id="loading-screen">
-        <!-- Убедитесь, что файл bcblogo.png лежит рядом с index.html -->
-        <img src="bcblogo.png" alt="BCB Logo" class="loading-logo">
+        <!-- Переименованный логотип -->
+        <img src="bcblogo.PNG" alt="BCB Logo" class="loading-logo">
     </div>
 
-    <!-- Основной интерфейс: полностью пустой -->
-    <div id="app-interface">
-        <!-- Здесь ничего нет, виден только градиентный фон -->
-    </div>
+    <!-- Шапка с текстовым логотипом -->
+    <header>
+        <img src="bcbtextlogo.PNG" alt="BCB Text Logo" class="header-logo">
+    </header>
+
+    <!-- Область контента -->
+    <main>
+        <!-- Вкладка 1: В разработке -->
+        <div id="tab-dev" class="tab-content">
+            <h2>🚧 В разработке</h2>
+            <p style="margin-top: 10px; opacity: 0.6;">Этот раздел скоро появится.</p>
+        </div>
+
+        <!-- Вкладка 2: Играть (Активна по умолчанию) -->
+        <div id="tab-play" class="tab-content active">
+            <div class="play-placeholder">
+                <p> Игровая зона</p>
+                <p style="font-size: 0.9em; margin-top: 10px;">Выберите игру ниже</p>
+            </div>
+        </div>
+
+        <!-- Вкладка 3: Профиль -->
+        <div id="tab-profile" class="tab-content">
+            <div class="profile-container">
+                <!-- Аватарка пользователя -->
+                <img id="profile-avatar" src="" alt="Avatar" class="user-avatar">
+                <!-- Никнейм -->
+                <div id="profile-name" class="user-name">User</div>
+                <!-- Юзернейм -->
+                <div id="profile-username" class="user-username">@username</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Нижняя навигация -->
+    <nav>
+        <div class="nav-item" data-target="tab-dev">
+            <!-- Иконка шестеренки/инструментов -->
+            <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>
+            <span>Разработка</span>
+        </div>
+        
+        <div class="nav-item active" data-target="tab-play">
+            <!-- Иконка игровой кнопки/джойстика -->
+            <svg viewBox="0 0 24 24"><path d="M21,6H3C1.9,6,1,6.9,1,8v8c0,1.1,0.9,2,2,2h18c1.1,0,2-0.9,2-2V8C23,6.9,22.1,6,21,6z M10,13H8v2H6v-2H4v-2h2V9h2v2h2V13z M17,13.5 c-0.83,0-1.5-0.67-1.5-1.5s0.67-1.5,1.5-1.5s1.5,0.67,1.5,1.5S17.83,13.5,17,13.5z M17,10.5c-0.83,0-1.5-0.67-1.5-1.5 s0.67-1.5,1.5-1.5s1.5,0.67,1.5,1.5S17.83,10.5,17,10.5z"/></svg>
+            <span>Играть</span>
+        </div>
+        
+        <div class="nav-item" data-target="tab-profile">
+            <!-- Иконка пользователя -->
+            <svg viewBox="0 0 24 24"><path d="M12,12c2.21,0,4-1.79,4-4s-1.79-4-4-4s-4,1.79-4,4S9.79,12,12,12z M12,14c-2.67,0-8,1.34-8,4v2h16v-2 C20,15.34,14.67,14,12,14z"/></svg>
+            <span>Профиль</span>
+        </div>
+    </nav>
 
     <script>
-        // Инициализация Telegram WebApp
+        // --- Инициализация Telegram WebApp ---
         const tg = window.Telegram.WebApp;
-        
-        // Сообщаем телеграму, что приложение готово
         tg.ready();
-        
-        // Разворачиваем на весь экран
         tg.expand();
         
-        // Устанавливаем цвет хедера в тон фона (темно-бордовый)
+        // Установка цветов темы
         tg.setHeaderColor('#4a0e2d');
         tg.setBackgroundColor('#4a0e2d');
 
+        // --- Данные пользователя ---
+        const user = tg.initDataUnsafe.user || {};
+        
+        // Заполнение профиля данными из Telegram
+        const avatarImg = document.getElementById('profile-avatar');
+        const nameDiv = document.getElementById('profile-name');
+        const usernameDiv = document.getElementById('profile-username');
+
+        // Если есть фото, используем его, иначе заглушка или инициалы
+        if (user.photo_url) {
+            avatarImg.src = user.photo_url;
+        } else {
+            // Заглушка, если нет фото (можно заменить на дефолтную картинку)
+            avatarImg.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjIpIj48cGF0aCBkPSJNMTIgMTJjMi4yMSAwIDQtMS43OSA0LTRzLTEuNzktNC00LTRzLTQgMS43OS00IDRTOS43OSAxMiAxMiAxMnogTTEyIDE0Yy0yLjY3IDAtOCAxLjM0LTggNHYyaDE2di0yQzIwIDE1LjM0IDE0LjY3IDE0IDEyIDE0eiIvPjwvc3ZnPg==';
+        }
+
+        nameDiv.textContent = user.first_name + (user.last_name ? ' ' + user.last_name : '') || 'Игрок BCB';
+        usernameDiv.textContent = user.username ? '@' + user.username : 'Нет юзернейма';
+
+
+        // --- Логика загрузки ---
         const loadingScreen = document.getElementById('loading-screen');
-        const appInterface = document.getElementById('app-interface');
-
-        // Логика переключения экранов
+        
         window.addEventListener('load', () => {
-            // Время показа заставки (в миллисекундах)
-            const splashDuration = 2500; 
-
             setTimeout(() => {
-                // 1. Начинаем скрывать заставку
                 loadingScreen.classList.add('hidden');
-
-                // 2. Показываем пустой интерфейс
-                appInterface.classList.add('visible');
-
-                // 3. Полностью удаляем заставку из DOM после анимации (опционально)
                 setTimeout(() => {
                     loadingScreen.style.display = 'none';
-                }, 600); // Время должно совпадать с transition в CSS (0.6s)
-
-            }, splashDuration);
+                }, 600);
+            }, 2000); // 2 секунды заставки
         });
+
+
+        // --- Логика навигации ---
+        const navItems = document.querySelectorAll('.nav-item');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                // Пропускаем клик, если это вкладка "В разработке" (опционально)
+                // if (item.dataset.target === 'tab-dev') return; 
+
+                // Убираем активный класс у всех кнопок и табов
+                navItems.forEach(nav => nav.classList.remove('active'));
+                tabContents.forEach(tab => tab.classList.remove('active'));
+
+                // Добавляем активный класс нажатой кнопке
+                item.classList.add('active');
+
+                // Показываем соответствующий таб
+                const targetId = item.getAttribute('data-target');
+                document.getElementById(targetId).classList.add('active');
+                
+                // Вибрация при переключении (Haptic Feedback)
+                tg.HapticFeedback.impactOccurred('light');
+            });
+        });
+
     </script>
 </body>
 </html>
