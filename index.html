@@ -80,7 +80,7 @@
             filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
         }
 
-        /* --- БАЛАНС (КОМПАКТНЫЙ, КАК НА ФОТО 2) --- */
+        /* --- БАЛАНС (КОМПАКТНЫЙ) --- */
         .balance-pill {
             position: absolute;
             /* Позиция осталась прежней */
@@ -91,15 +91,15 @@
             align-items: center;
             justify-content: center;
             
-            /* УМЕНЬШЕННЫЕ РАЗМЕРЫ ТАБЛЕТКИ */
-            height: 26px; /* Было больше, теперь компактно */
-            min-width: 52px; /* Минимальная ширина для "0" */
+            /* РАЗМЕРЫ ТАБЛЕТКИ НЕ ТРОНУТЫ */
+            height: 26px; 
+            min-width: 52px; 
             width: auto; 
-            padding: 0 8px; /* Минимальные отступы по бокам */
-            gap: 4px; /* Расстояние между цифрой и иконкой как на фото */
+            padding: 0 8px; 
+            gap: 4px; 
             
             background: linear-gradient(180deg, #FCD34D 0%, #F59E0B 100%);
-            border-radius: 13px; /* Скругление под новую высоту */
+            border-radius: 13px; 
             box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.2);
             
@@ -115,7 +115,7 @@
         }
 
         .balance-text {
-            font-size: 14px; /* Размер цифры */
+            font-size: 14px; 
             font-weight: 700;
             color: #fff;
             text-shadow: 0 1px 2px rgba(0,0,0,0.1);
@@ -123,9 +123,9 @@
             white-space: nowrap; 
         }
 
-        /* ИКОНКА ВИШНИ (РАЗМЕР НЕ МЕНЯЛСЯ, ТОЛЬКО ПОДГОНКА ПО ЦЕНТРУ) */
+        /* ИКОНКА ВИШНИ: УВЕЛИЧЕНА В 1.5 РАЗА (было 18px -> стало 27px) */
         .balance-star-img {
-            height: 18px; /* Оптимальный размер для новой высоты таблетки */
+            height: 27px; 
             width: auto;
             object-fit: contain;
             display: block;
@@ -365,10 +365,10 @@
     <header>
         <img src="bcblogotext.PNG" alt="BCB Text Logo" class="header-logo" onerror="this.style.display='none'">
         
-        <!-- Компактная таблетка баланса -->
+        <!-- Таблетка с увеличенной вишней -->
         <div class="balance-pill" id="balance-pill">
             <span class="balance-text">0</span>
-            <img src="iconcherry.PNG" alt="🍒" class="balance-star-img" onerror="this.style.display='none'">
+            <img src="iconcherry.PNG" alt="" class="balance-star-img" onerror="this.style.display='none'">
         </div>
     </header>
 
