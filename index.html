@@ -8,164 +8,130 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
     <style>
-        /* Общие стили */
+        /* Сброс стилей и базовые настройки */
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            /* Градиентный фон, похожий на ваше фото (темно-бордовый/фиолетовый) */
+            /* Градиентный фон (темно-бордовый/фиолетовый) */
             background: linear-gradient(135deg, #4a0e2d, #7b1f4c);
             color: white;
             height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            overflow: hidden; /* Убираем прокрутку во время загрузки */
+            width: 100vw;
+            overflow: hidden; /* Запрещаем прокрутку */
+            position: relative;
         }
 
-        /* Стили для экрана загрузки */
+        /* --- Экран загрузки --- */
         #loading-screen {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            width: 100%;
             position: absolute;
             top: 0;
             left: 0;
-            z-index: 10;
-            background: inherit; /* Наследуем фон от body */
-            transition: opacity 0.5s ease-out; /* Плавное исчезновение */
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center; /* Центр по горизонтали */
+            align-items: center;     /* Центр по вертикали */
+            z-index: 100;
+            background: inherit;     /* Наследуем градиент фона */
+            transition: opacity 0.6s ease-out; /* Плавное исчезновение */
         }
 
         .loading-logo {
-            max-width: 60%; /* Адаптивный размер логотипа */
-            max-height: 40vh;
+            width: 50%;              /* Размер логотипа относительно экрана */
+            max-width: 250px;        /* Максимальный размер */
+            height: auto;
             object-fit: contain;
-            animation: fadeInScale 1.5s ease-in-out forwards;
+            animation: pulseLogo 2s infinite ease-in-out; /* Легкая пульсация */
         }
 
-        .loading-text {
-            margin-top: 25px;
-            font-size: 1.2em;
-            font-weight: 500;
-            letter-spacing: 1px;
-            opacity: 0;
-            animation: fadeInPulse 2s infinite 1s; /* Начинается после появления лого */
+        /* Анимация пульсации логотипа */
+        @keyframes pulseLogo {
+            0% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.9; }
         }
 
-        /* Стили для основного интерфейса */
-        #app-interface {
-            display: none; /* Скрыт по умолчанию */
-            width: 90%;
-            max-width: 400px;
-            padding: 30px 20px;
-            background-color: rgba(255, 255, 255, 0.08);
-            border-radius: 20px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            animation: slideUpFade 0.6s ease-out forwards;
-        }
-
-        #app-interface h1 {
-            margin-top: 0;
-            font-size: 1.8em;
-            color: #fff;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-
-        #app-interface p {
-            color: rgba(255, 255, 255, 0.8);
-            line-height: 1.5;
-        }
-
-        /* Анимации */
-        @keyframes fadeInScale {
-            from { opacity: 0; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        @keyframes fadeInPulse {
-            0% { opacity: 0.4; transform: translateY(0); }
-            50% { opacity: 1; transform: translateY(-3px); }
-            100% { opacity: 0.4; transform: translateY(0); }
-        }
-
-        @keyframes slideUpFade {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Класс для плавного скрытия загрузочного экрана */
-        .fade-out {
+        /* Класс для скрытия экрана загрузки */
+        .hidden {
             opacity: 0;
             pointer-events: none;
         }
+
+        /* --- Основной интерфейс --- */
+        #app-interface {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Интерфейс полностью пустой, виден только фон body */
+            display: none; /* Скрыт до конца загрузки */
+            opacity: 0;
+            transition: opacity 0.6s ease-in;
+        }
+
+        /* Класс для плавного появления интерфейса */
+        .visible {
+            display: block !important;
+            opacity: 1 !important;
+        }
+
     </style>
 </head>
 <body>
 
-    <!-- Экран загрузки -->
+    <!-- Экран загрузки: только логотип по центру -->
     <div id="loading-screen">
-        <!-- Замените 'bcblogo.png' на путь к вашему логотипу -->
-        <img src="bcblogo.png" alt="BCB Logo" class="loading-logo">
-        <p class="loading-text">Загрузка BCB...</p>
+        <!-- Убедитесь, что файл bcblogo.png лежит рядом с index.html -->
+        <img src="bcblogo.PNG" alt="BCB Logo" class="loading-logo">
     </div>
 
-    <!-- Основной интерфейс приложения -->
+    <!-- Основной интерфейс: полностью пустой -->
     <div id="app-interface">
-        <header>
-            <h1>Добро пожаловать в BCB!</h1>
-        </header>
-        <main>
-            <p>Ваше виртуальное казино готово к игре.</p>
-            <!-- Здесь будет ваш игровой контент: кнопки, баланс, слоты и т.д. -->
-        </main>
+        <!-- Здесь ничего нет, виден только градиентный фон -->
     </div>
 
     <script>
-        // Инициализируем Telegram Web App
+        // Инициализация Telegram WebApp
         const tg = window.Telegram.WebApp;
-
-        // Сообщаем Telegram, что приложение готово
+        
+        // Сообщаем телеграму, что приложение готово
         tg.ready();
         
-        // Расширяем приложение на весь экран
+        // Разворачиваем на весь экран
         tg.expand();
+        
+        // Устанавливаем цвет хедера в тон фона (темно-бордовый)
+        tg.setHeaderColor('#4a0e2d');
+        tg.setBackgroundColor('#4a0e2d');
 
-        // Получаем элементы DOM
         const loadingScreen = document.getElementById('loading-screen');
         const appInterface = document.getElementById('app-interface');
 
-        // Функция для имитации загрузки и перехода к интерфейсу
-        function startApp() {
-            // Время загрузки в миллисекундах (например, 2.5 секунды)
-            const loadingDuration = 2500;
+        // Логика переключения экранов
+        window.addEventListener('load', () => {
+            // Время показа заставки (в миллисекундах)
+            const splashDuration = 2500; 
 
             setTimeout(() => {
-                // Добавляем класс для плавного исчезновения
-                loadingScreen.classList.add('fade-out');
+                // 1. Начинаем скрывать заставку
+                loadingScreen.classList.add('hidden');
 
-                // После завершения анимации исчезновения (0.5s) переключаем видимость
+                // 2. Показываем пустой интерфейс
+                appInterface.classList.add('visible');
+
+                // 3. Полностью удаляем заставку из DOM после анимации (опционально)
                 setTimeout(() => {
                     loadingScreen.style.display = 'none';
-                    appInterface.style.display = 'block';
-                    
-                    // Опционально: устанавливаем цвет хедера Telegram под тему приложения
-                    // Используем темный бордовый цвет из градиента
-                    tg.setHeaderColor('#4a0e2d'); 
-                    
-                }, 500); // Это время должно совпадать с duration в CSS .fade-out
+                }, 600); // Время должно совпадать с transition в CSS (0.6s)
 
-            }, loadingDuration);
-        }
-
-        // Запускаем процесс при загрузке страницы
-        window.onload = startApp;
+            }, splashDuration);
+        });
     </script>
 </body>
 </html>
