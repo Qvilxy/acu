@@ -17,7 +17,7 @@
             -webkit-tap-highlight-color: transparent;
             user-select: none;
             -webkit-user-select: none;
-            touch-action: none; /* Критично для drag-and-drop на iOS */
+            /* Запрещаем выделение текста везде */
         }
 
         body {
@@ -42,11 +42,10 @@
             justify-content: center;
             align-items: center;
             z-index: 9999;
-            background: linear-gradient(135deg, #4a0e2d, #7b1f4c); /* Дублируем фон на случай долгой загрузки body */
+            background: linear-gradient(135deg, #4a0e2d, #7b1f4c);
             transition: opacity 0.6s ease-out, visibility 0.6s;
         }
 
-        /* Класс для полного скрытия загрузки */
         #loading-screen.loaded {
             opacity: 0;
             visibility: hidden;
@@ -58,24 +57,21 @@
             max-width: 250px;
             height: auto;
             object-fit: contain;
-            /* Фолбэк, если картинка не загрузится */
             background: rgba(255, 255, 255, 0.05);
             border-radius: 20px;
         }
 
-        /* --- Шапка приложения --- */
+        /* --- ШАПКА ПРИЛОЖЕНИЯ (ОБНОВЛЕНА) --- */
         header {
-            /* Увеличенная высота: safe-area + отступы */
+            /* Фиксированная высота 120px + безопасная зона для челки iPhone */
+            height: 120px; 
             padding-top: env(safe-area-inset-top, 20px); 
-            padding-bottom: 20px;
-            padding-left: 20px;
-            padding-right: 20px;
             
             display: flex;
             justify-content: center;
             align-items: center;
             
-            /* Прозрачный фон, чтобы сливался с главным градиентом */
+            /* Прозрачный фон, сливается с градиентом */
             background: transparent; 
             
             flex-shrink: 0;
@@ -84,7 +80,7 @@
         }
 
         .header-logo {
-            /* Увеличен в 3 раза: было 25px, стало 75px */
+            /* Логотип адаптируется под высоту шапки */
             height: 75px; 
             width: auto;
             max-width: 90%;
@@ -97,6 +93,7 @@
             flex-grow: 1;
             position: relative;
             overflow-y: auto;
+            /* Отступ снизу, чтобы контент не перекрывался меню */
             padding-bottom: 120px; 
             width: 100%;
         }
@@ -183,6 +180,10 @@
             padding: 6px;
             z-index: 1000;
             overflow: hidden;
+            
+            /* КРИТИЧЕСКИ ВАЖНО ДЛЯ ПЛАВНОСТИ: отключаем системные жесты браузера в этой зоне */
+            touch-action: none; 
+            -webkit-touch-callout: none;
         }
 
         .nav-track {
@@ -244,7 +245,7 @@
             
             will-change: transform, background, border-color, box-shadow;
             
-            /* Используем CSS переменные для безопасного управления движением и масштабом */
+            /* Используем CSS переменные для разделения движения и масштаба */
             transform: translateX(var(--tx, 0px)) scale(var(--scale, 1));
             
             /* Плавная анимация по умолчанию */
@@ -256,7 +257,6 @@
         }
 
         /* Состояние: АКТИВНОЕ ДВИЖЕНИЕ (Drag или Snap) */
-        /* Радужный эффект применяется и при перетаскивании, и при автоматическом полете */
         .glass-pill.dragging,
         .glass-pill.animating {
             background: rgba(255, 255, 255, 0.25);
@@ -264,7 +264,7 @@
             /* Радужная рамка (Мыльный пузырь) */
             border: 2px solid transparent;
             background-image: 
-                linear-gradient(#2a0a1a, #2a0a1a), /* Цвет фона плитки внутри рамки */
+                linear-gradient(#2a0a1a, #2a0a1a), 
                 conic-gradient(from 0deg, #ff00cc, #3333ff, #00ffcc, #ffff00, #ff00cc);
             background-origin: border-box;
             background-clip: padding-box, border-box;
@@ -276,12 +276,13 @@
                 inset 0 0 10px rgba(255, 255, 255, 0.2);
         }
 
-        /* Специфика перетаскивания: мгновенная реакция на палец (отключаем анимацию transform) */
+        /* Специфика перетаскивания: мгновенная реакция на палец */
         .glass-pill.dragging {
             transition: 
                 background 0.1s,
                 border-color 0.1s, 
                 box-shadow 0.1s;
+            /* Transform не анимируется во время драга, чтобы не было задержки */
         }
 
     </style>
@@ -290,7 +291,6 @@
 
     <!-- Экран загрузки -->
     <div id="loading-screen">
-        <!-- onerror скрывает картинку, если она не найдена, чтобы не блокировать загрузку -->
         <img src="bcblogo.PNG" alt="BCB Logo" class="loading-logo" onerror="this.style.display='none'">
     </div>
 
@@ -371,7 +371,7 @@
         if (user.photo_url) {
             avatarImg.src = user.photo_url;
         } else {
-            // SVG заглушка, если нет фото
+            // SVG заглушка
             avatarImg.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjIpIj48cGF0aCBkPSJNMTIgMTJjMi4yMSAwIDQtMS43OSA0LTRzLTEuNzktNC00LTRzLTQgMS43OS00IDRTOS43OSAxMiAxMiAxMnogTTEyIDE0Yy0yLjY3IDAtOCAxLjM0LTggNHYyaDE2di0yQzIwIDE1LjM0IDE0LjY3IDE0IDEyIDE0eiIvPjwvc3ZnPg==';
         }
         
@@ -381,11 +381,9 @@
         // --- 3. ЖЕСТКАЯ ЛОГИКА ЗАГРУЗКИ (ANTI-HANG) ---
         const loadingScreen = document.getElementById('loading-screen');
         
-        // Принудительное скрытие через 2 секунды, ЧТО БЫ НИ СЛУЧИЛОСЬ
-        // Это гарантирует, что приложение запустится даже при битых картинках или медленном интернете
+        // Принудительное скрытие через 2 секунды
         setTimeout(() => {
             loadingScreen.classList.add('loaded');
-            // Полностью удаляем из DOM после завершения CSS анимации (0.6s)
             setTimeout(() => { 
                 if(loadingScreen) loadingScreen.remove(); 
             }, 600);
@@ -417,11 +415,9 @@
                 pill.classList.add('dragging');
                 pill.classList.remove('animating');
             } else if (!animate) {
-                // Инициализация: убираем эффекты, отключаем анимацию
                 pill.classList.remove('dragging', 'animating');
                 pill.style.transition = 'none';
             } else {
-                // Анимация полета (snap): включаем радугу
                 pill.classList.remove('dragging');
                 pill.classList.add('animating');
                 
@@ -510,8 +506,10 @@
             navBar.addEventListener('touchstart', (e) => startDrag(e.touches[0].clientX), {passive: false});
         }
         window.addEventListener('touchmove', (e) => {
-            if(isDragging) e.preventDefault(); // Блокируем скролл страницы при драге
-            moveDrag(e.touches[0].clientX);
+            if(isDragging) {
+                e.preventDefault(); // Блокируем скролл страницы при драге (важно для плавности!)
+                moveDrag(e.touches[0].clientX);
+            }
         }, {passive: false});
         window.addEventListener('touchend', endDrag);
 
