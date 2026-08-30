@@ -198,18 +198,27 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
-            /* Большие отступы сверху и снизу позволяют первой и последней карточке встать ровно по центру */
-            padding: 45vh 20px 45vh 20px; 
+            /* УБРАЛ PADDING, ДОБАВИЛ MARGIN ЧЕРЕЗ СПЕЙСЕРЫ НИЖЕ */
+            padding: 0 20px; 
             overflow-y: scroll;
             scroll-behavior: smooth;
             scrollbar-width: none;
             -ms-overflow-style: none;
             touch-action: pan-y;
             height: 100%;
+            /* Важно: убираем дефолтное выравнивание, будем центрировать через JS и спейсеры */
+            align-items: stretch; 
         }
         
         .games-list::-webkit-scrollbar {
             display: none;
+        }
+
+        /* Спейсеры для бесконечного скролла (вместо padding) */
+        .scroll-spacer {
+            width: 100%;
+            flex-shrink: 0;
+            /* Высота будет задана через JS, чтобы быть ровно половиной экрана минус половина карточки */
         }
 
         /* Общий стиль карточки игры */
@@ -221,10 +230,17 @@
             justify-content: center;
             box-shadow: 0 15px 30px rgba(0,0,0,0.4);
             border: 1px solid rgba(255,255,255,0.05);
-            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); /* Чуть быстрее анимация */
             position: relative;
             flex-shrink: 0;
             will-change: transform, height, opacity;
+            
+            /* По умолчанию маленькая */
+            height: 120px;
+            opacity: 0.5;
+            transform: scale(0.9);
+            filter: brightness(0.7);
+            z-index: 1;
         }
 
         /* Иконка замка */
@@ -237,22 +253,14 @@
 
         /* БОЛЬШАЯ КАРТОЧКА (Квадрат) */
         .game-card.large {
+            /* Используем aspect-ratio, теперь он работает т.к. нет padding у родителя */
+            aspect-ratio: 1 / 1; 
             width: 100%;
-            aspect-ratio: 1 / 1; /* ЖЕСТКИЙ КВАДРАТ */
             transform: scale(1);
             opacity: 1;
             z-index: 2;
             box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-        }
-
-        /* МАЛЕНЬКАЯ КАРТОЧКА (Плоский прямоугольник) */
-        .game-card.small {
-            width: 100%;
-            height: 120px;
-            opacity: 0.5;
-            transform: scale(0.9);
-            z-index: 1;
-            filter: brightness(0.7);
+            filter: brightness(1);
         }
 
         /* ПОЛЗУНОК СПРАВА */
@@ -285,7 +293,7 @@
             background: #FCD34D;
             border-radius: 50%;
             box-shadow: 0 0 15px rgba(252, 211, 77, 0.8);
-            transition: top 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), height 0.3s ease, border-radius 0.3s ease;
+            transition: top 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), height 0.2s ease, border-radius 0.2s ease;
             z-index: 2;
         }
         
@@ -301,9 +309,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            /* ИЗМЕНЕНО: Выравнивание по верху с отступом, а не по центру */
-            justify-content: flex-start; 
-            padding-top: 40px; /* Отступ от шапки */
+            justify-content: flex-start; /* Прижимаем к верху */
+            padding-top: 40px;
             height: 100%;
             gap: 15px;
         }
@@ -780,6 +787,7 @@
 
         function renderInitialCards() {
             gamesList.innerHTML = '';
+            
             // Создаем буфер из 3 элементов: [Предыдущий, Текущий, Следующий]
             const sequence = getSequence(currentGameIndex);
             
@@ -788,11 +796,28 @@
                 gamesList.appendChild(card);
             });
 
-            // Скроллим к центральному элементу (индекс 1 в массиве из 3 элементов)
+            // Добавляем спейсеры сверху и снизу для центрирования первой и последней карточки
+            // Высота спейсера = (Высота экрана / 2) - (Высота карточки / 2)
+            // Но так как высота карточки меняется (120px или квадрат), сделаем спейсеры динамическими или просто большими
+            // Для простоты сделаем spacers высотой 50vh, это гарантирует, что карточка сможет встать по центру
+            
+            const spacerTop = document.createElement('div');
+            spacerTop.className = 'scroll-spacer';
+            spacerTop.style.height = '50vh';
+            spacerTop.style.marginBottom = '-60px'; // Компенсация половины высоты маленькой карточки (120/2)
+            gamesList.prepend(spacerTop);
+
+            const spacerBottom = document.createElement('div');
+            spacerBottom.className = 'scroll-spacer';
+            spacerBottom.style.height = '50vh';
+            spacerBottom.style.marginTop = '-60px';
+            gamesList.appendChild(spacerBottom);
+
+            // Скроллим к центральному элементу (индекс 1 в массиве из 3 элементов + 1 спейсер = индекс 2 в DOM)
             setTimeout(() => {
-                const centerCard = gamesList.children[1];
+                const centerCard = gamesList.children[1]; // Индекс 1, т.к. 0 - это спейсер
                 if(centerCard) {
-                    const cardHeight = centerCard.offsetHeight;
+                    const cardHeight = centerCard.offsetHeight; // Должно быть 120px изначально
                     const containerHeight = gamesList.clientHeight;
                     // Центрируем активную карточку
                     const offset = (containerHeight - cardHeight) / 2;
@@ -812,29 +837,27 @@
 
         function createCardElement(modeIdx, seqIdx) {
             const div = document.createElement('div');
-            div.className = 'game-card';
+            div.className = 'game-card'; // По умолчанию small
             div.dataset.modeIdx = modeIdx;
-            div.dataset.seqIdx = seqIdx; // 0 - верх, 1 - центр, 2 - низ
+            div.dataset.seqIdx = seqIdx; 
             div.innerHTML = lockSvg;
             return div;
         }
 
         function updateSliderState(animate = true) {
-            const cards = Array.from(gamesList.children);
+            const cards = Array.from(gamesList.children).filter(el => el.classList.contains('game-card')); // Берем только карточки, игнорируем спейсеры
             const centerScroll = gamesList.scrollTop + (gamesList.clientHeight / 2);
             
             let closestCard = null;
             let minDiff = Infinity;
-            let activeSeqIdx = -1;
 
             // Находим карточку, чей центр ближе всего к центру экрана
-            cards.forEach((card, i) => {
+            cards.forEach((card) => {
                 const cardCenter = card.offsetTop + (card.offsetHeight / 2);
                 const diff = Math.abs(centerScroll - cardCenter);
                 if (diff < minDiff) {
                     minDiff = diff;
                     closestCard = card;
-                    activeSeqIdx = i;
                 }
             });
 
@@ -846,21 +869,25 @@
                     currentGameIndex = modeIdx;
                     // Перерисовываем DOM, чтобы сохранить правильный порядок (бесконечность)
                     rebuildListSmoothly(modeIdx);
+                    return; // Прерываем, чтобы не применять классы к старым элементам, которые удалятся
                 }
 
                 // Обновляем классы размеров
                 cards.forEach(c => {
-                    c.className = 'game-card small'; 
+                    c.classList.remove('large');
+                    c.classList.add('small');
                 });
-                closestCard.className = 'game-card large'; 
+                
+                closestCard.classList.remove('small');
+                closestCard.classList.add('large'); 
 
                 // Обновляем ползунок
-                updateScrollIndicator(activeSeqIdx, animate);
+                updateScrollIndicator(animate);
             }
         }
 
         function rebuildListSmoothly(newIndex) {
-            // Сохраняем текущую позицию скролла относительно верха контейнера
+            // Сохраняем текущую позицию скролла
             const currentScroll = gamesList.scrollTop;
             
             // Очищаем и пересоздаем
@@ -872,19 +899,34 @@
                 gamesList.appendChild(card);
             });
 
-            // Возвращаем скролл так, чтобы новая центральная карточка (индекс 1) была там же, где и старая
+            // Возвращаем спейсеры
+            const spacerTop = document.createElement('div');
+            spacerTop.className = 'scroll-spacer';
+            spacerTop.style.height = '50vh';
+            spacerTop.style.marginBottom = '-60px';
+            gamesList.prepend(spacerTop);
+
+            const spacerBottom = document.createElement('div');
+            spacerBottom.className = 'scroll-spacer';
+            spacerBottom.style.height = '50vh';
+            spacerBottom.style.marginTop = '-60px';
+            gamesList.appendChild(spacerBottom);
+
+            // Восстанавливаем скролл так, чтобы новая центральная карточка (индекс 1) была в центре
             setTimeout(() => {
-                const centerCard = gamesList.children[1];
+                const centerCard = gamesList.children[1]; // Индекс 1, т.к. 0 - спейсер
                 if(centerCard) {
                     const cardHeight = centerCard.offsetHeight;
                     const containerHeight = gamesList.clientHeight;
                     const offset = (containerHeight - cardHeight) / 2;
                     gamesList.scrollTop = centerCard.offsetTop - offset;
                 }
+                // Принудительно обновляем состояние после перерисовки
+                updateSliderState(false);
             }, 10);
         }
 
-        function updateScrollIndicator(seqIdx, animate) {
+        function updateScrollIndicator(animate) {
             const trackHeight = document.querySelector('.scroll-track').offsetHeight;
             const indicatorHeight = 12; 
             
@@ -896,7 +938,7 @@
 
             const topPos = (trackHeight - indicatorHeight) * (percent / 100);
             
-            trackIndicator.style.transition = animate ? 'top 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), height 0.3s, border-radius 0.3s' : 'none';
+            trackIndicator.style.transition = animate ? 'top 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), height 0.2s, border-radius 0.2s' : 'none';
             trackIndicator.style.top = `${topPos}px`;
 
             // Эффект Шар <-> Полоска
@@ -956,7 +998,7 @@
             updateSliderState(true); 
             
             setTimeout(() => {
-                const cards = Array.from(gamesList.children);
+                const cards = Array.from(gamesList.children).filter(el => el.classList.contains('game-card'));
                 let closestCard = null;
                 let minDiff = Infinity;
                 const centerScroll = gamesList.scrollTop + (gamesList.clientHeight / 2);
@@ -983,7 +1025,7 @@
                 if (currentIndex === 1 && !isSliderDragging) { 
                     gamesList.style.scrollBehavior = 'smooth';
                     // Скроллим вниз на высоту карточки + отступ
-                    const cardHeight = gamesList.children[0] ? gamesList.children[0].offsetHeight : 200;
+                    const cardHeight = gamesList.children[1] ? gamesList.children[1].offsetHeight : 120; // children[1] т.к. 0 - спейсер
                     gamesList.scrollTop += (cardHeight + 20);
                     
                     setTimeout(() => {
