@@ -20,7 +20,7 @@
         }
 
         html, body {
-            overscroll-behavior: none; /* Запрет bounce-эффекта и свайпа */
+            overscroll-behavior: none;
             overflow: hidden;
             position: fixed;
             width: 100%;
@@ -181,7 +181,7 @@
             height: 100%;
             position: relative;
             overflow: hidden;
-            touch-action: none; /* Запрет нативного скролла/свайпа */
+            touch-action: none;
         }
         
         #tab-play.active {
@@ -193,26 +193,20 @@
             display: flex;
             width: 100%;
             height: 100%;
-            max-width: 500px;
-            margin: 0 auto;
             position: relative;
-            padding-bottom: 130px; /* Отступ чтобы меню не перекрывало 3-й режим */
+            padding-bottom: 20px;
             box-sizing: border-box;
         }
 
-        /* Область с карточками — центрируем по вертикали */
+        /* Область с карточками — на всю высоту */
         .games-list {
             flex-grow: 1;
             display: flex;
             flex-direction: column;
             gap: 14px;
-            padding: 10px 20px 0 20px;
-            overflow: visible;
-            align-items: center;
-            justify-content: center; /* Центрируем карточки по вертикали */
+            padding: 0 12px;
             width: 100%;
-            max-width: 340px;
-            margin: 0 auto;
+            height: 100%;
         }
 
         /* Общий стиль карточки игры */
@@ -238,16 +232,16 @@
             opacity: 0.8;
         }
 
-        /* БОЛЬШАЯ КАРТОЧКА — ИДЕАЛЬНЫЙ КВАДРАТ */
+        /* БОЛЬШАЯ КАРТОЧКА — занимает ~60% высоты */
         .game-card.large {
-            aspect-ratio: 1 / 1; /* Высота = Ширине = идеальный квадрат */
+            flex: 2.5; /* Большая часть пространства */
             transform: scale(1);
             z-index: 2;
         }
 
-        /* МАЛЕНЬКАЯ КАРТОЧКА (Плоский прямоугольник) */
+        /* МАЛЕНЬКАЯ КАРТОЧКА — делят оставшееся пространство */
         .game-card.small {
-            height: 75px; /* Фиксированная небольшая высота */
+            flex: 1; /* Меньшая часть */
             opacity: 0.7;
             transform: scale(0.97);
             z-index: 1;
@@ -313,20 +307,20 @@
             z-index: 2;
         }
         
-        /* Класс для превращения в полоску при движении */
         .track-indicator.stretching {
             height: 40px;
             border-radius: 10px;
             background: #F59E0B;
         }
 
-        /* Стили для вкладки "Профиль" */
+        /* --- ВКЛАДКА ПРОФИЛЬ (ИСПРАВЛЕНО) --- */
         .profile-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start; /* Было center, теперь сверху */
             height: 100%;
+            padding-top: 30px; /* Отступ от шапки */
             gap: 6px;
         }
 
@@ -431,7 +425,6 @@
             color: #F2F2F7;
         }
 
-        /* АНИМАЦИЯ ЦЕПИ */
         .nav-item.active-text svg.icon-chain {
             animation: stretchChain 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
@@ -618,7 +611,6 @@
                 tg.setHeaderColor('#4a0e2d');
                 tg.setBackgroundColor('#4a0e2d');
                 
-                // ЗАПРЕТ СВОРАЧИВАНИЯ ПРИ СВАЙПЕ ВНИЗ
                 if (tg.disableVerticalSwipes) {
                     tg.disableVerticalSwipes();
                 }
@@ -813,12 +805,10 @@
         let startY = 0;
         let autoSwitchInterval;
 
-        // Инициализация
         function initGamesSlider() {
             updateCardSizes(false);
             updateScrollIndicator(false);
             
-            // Свайп отслеживаем на всей вкладке "Играть"
             tabPlay.addEventListener('touchstart', handleTouchStart, {passive: false});
             tabPlay.addEventListener('touchmove', handleTouchMove, {passive: false});
             tabPlay.addEventListener('touchend', handleTouchEnd);
@@ -827,7 +817,6 @@
             window.addEventListener('mousemove', handleMouseMove);
             window.addEventListener('mouseup', handleMouseUp);
 
-            // Запуск авто-переключения
             startAutoSwitch();
         }
 
@@ -879,9 +868,7 @@
             if(tg?.HapticFeedback) tg.HapticFeedback.lightImpactOccurred();
         }
 
-        // --- Обработчики Свайпа ---
         function handleTouchStart(e) {
-            // Игнорируем свайпы на меню навигации
             if (e.target.closest('nav')) return;
             isSliderDragging = true;
             startY = e.touches[0].clientY;
@@ -890,7 +877,7 @@
 
         function handleTouchMove(e) {
             if (!isSliderDragging) return;
-            e.preventDefault(); // Запрещаем нативный скролл и свайп вниз Telegram
+            e.preventDefault();
         }
 
         function handleTouchEnd(e) {
@@ -949,7 +936,6 @@
             }, 15000);
         }
 
-        // Запуск после загрузки
         setTimeout(initGamesSlider, 2200);
 
     </script>
