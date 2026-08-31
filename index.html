@@ -19,13 +19,18 @@
             -webkit-user-select: none;
         }
 
+        html, body {
+            overscroll-behavior: none; /* Запрет bounce-эффекта и свайпа */
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background: linear-gradient(135deg, #4a0e2d, #7b1f4c);
             color: white;
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
             display: flex;
             flex-direction: column;
         }
@@ -133,6 +138,7 @@
             position: relative;
             overflow: hidden;
             width: 100%;
+            overscroll-behavior: none;
         }
 
         .tab-content {
@@ -175,6 +181,7 @@
             height: 100%;
             position: relative;
             overflow: hidden;
+            touch-action: none; /* Запрет нативного скролла/свайпа */
         }
         
         #tab-play.active {
@@ -189,19 +196,23 @@
             max-width: 500px;
             margin: 0 auto;
             position: relative;
-            padding: 20px 0;
+            padding-bottom: 130px; /* Отступ чтобы меню не перекрывало 3-й режим */
+            box-sizing: border-box;
         }
 
-        /* Область с карточками */
+        /* Область с карточками — центрируем по вертикали */
         .games-list {
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            padding: 0 20px;
-            overflow: hidden;
-            touch-action: pan-y;
-            height: 100%;
+            gap: 14px;
+            padding: 10px 20px 0 20px;
+            overflow: visible;
+            align-items: center;
+            justify-content: center; /* Центрируем карточки по вертикали */
+            width: 100%;
+            max-width: 340px;
+            margin: 0 auto;
         }
 
         /* Общий стиль карточки игры */
@@ -216,6 +227,7 @@
             transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
             position: relative;
             flex-shrink: 0;
+            width: 100%;
         }
 
         /* Иконка замка */
@@ -226,20 +238,18 @@
             opacity: 0.8;
         }
 
-        /* БОЛЬШАЯ КАРТОЧКА (Квадрат) */
+        /* БОЛЬШАЯ КАРТОЧКА — ИДЕАЛЬНЫЙ КВАДРАТ */
         .game-card.large {
-            flex: 1.5; /* Занимает больше места */
-            max-height: 45vh;
+            aspect-ratio: 1 / 1; /* Высота = Ширине = идеальный квадрат */
             transform: scale(1);
             z-index: 2;
         }
 
         /* МАЛЕНЬКАЯ КАРТОЧКА (Плоский прямоугольник) */
         .game-card.small {
-            flex: 0.6; /* Занимает меньше места */
-            max-height: 140px;
+            height: 75px; /* Фиксированная небольшая высота */
             opacity: 0.7;
-            transform: scale(0.95);
+            transform: scale(0.97);
             z-index: 1;
         }
 
@@ -250,9 +260,9 @@
 
         @keyframes jellyWobble {
             0% { transform: scale(1); }
-            25% { transform: scale(1.05, 0.95); }
-            50% { transform: scale(0.95, 1.05); }
-            75% { transform: scale(1.02, 0.98); }
+            25% { transform: scale(1.04, 0.96); }
+            50% { transform: scale(0.96, 1.04); }
+            75% { transform: scale(1.01, 0.99); }
             100% { transform: scale(1); }
         }
 
@@ -607,6 +617,11 @@
                 tg.expand();
                 tg.setHeaderColor('#4a0e2d');
                 tg.setBackgroundColor('#4a0e2d');
+                
+                // ЗАПРЕТ СВОРАЧИВАНИЯ ПРИ СВАЙПЕ ВНИЗ
+                if (tg.disableVerticalSwipes) {
+                    tg.disableVerticalSwipes();
+                }
             } catch (e) {
                 console.warn('Telegram WebApp init error:', e);
             }
@@ -789,7 +804,7 @@
         });
 
         // --- 5. ЛОГИКА ИГРОВЫХ РЕЖИМОВ (3 РЕЖИМА) ---
-        const gamesList = document.getElementById('games-list');
+        const tabPlay = document.getElementById('tab-play');
         const trackIndicator = document.getElementById('track-indicator');
         const gameCards = document.querySelectorAll('.game-card');
         
@@ -803,12 +818,12 @@
             updateCardSizes(false);
             updateScrollIndicator(false);
             
-            // Обработчики свайпа
-            gamesList.addEventListener('touchstart', handleTouchStart, {passive: false});
-            gamesList.addEventListener('touchmove', handleTouchMove, {passive: false});
-            gamesList.addEventListener('touchend', handleTouchEnd);
+            // Свайп отслеживаем на всей вкладке "Играть"
+            tabPlay.addEventListener('touchstart', handleTouchStart, {passive: false});
+            tabPlay.addEventListener('touchmove', handleTouchMove, {passive: false});
+            tabPlay.addEventListener('touchend', handleTouchEnd);
             
-            gamesList.addEventListener('mousedown', handleMouseDown);
+            tabPlay.addEventListener('mousedown', handleMouseDown);
             window.addEventListener('mousemove', handleMouseMove);
             window.addEventListener('mouseup', handleMouseUp);
 
@@ -818,7 +833,6 @@
 
         function updateCardSizes(animate = true) {
             gameCards.forEach((card, i) => {
-                // Убираем анимацию желе
                 card.classList.remove('jelly');
                 
                 if (i === currentGameIndex) {
@@ -829,9 +843,8 @@
                     card.classList.remove('large');
                 }
                 
-                // Добавляем анимацию желе если нужно
                 if (animate) {
-                    void card.offsetWidth; // Триггер перерисовки
+                    void card.offsetWidth;
                     card.classList.add('jelly');
                 }
             });
@@ -851,7 +864,6 @@
             trackIndicator.style.transition = animate ? 'top 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), height 0.3s, border-radius 0.3s' : 'none';
             trackIndicator.style.top = `${topPos}px`;
 
-            // Эффект Шар <-> Полоска
             if (isSliderDragging) {
                 trackIndicator.classList.add('stretching');
             } else {
@@ -860,7 +872,6 @@
         }
 
         function switchGameMode(direction) {
-            // direction: 1 = следующий, -1 = предыдущий
             currentGameIndex = (currentGameIndex + direction + 3) % 3;
             updateCardSizes(true);
             updateScrollIndicator(true);
@@ -870,6 +881,8 @@
 
         // --- Обработчики Свайпа ---
         function handleTouchStart(e) {
+            // Игнорируем свайпы на меню навигации
+            if (e.target.closest('nav')) return;
             isSliderDragging = true;
             startY = e.touches[0].clientY;
             updateScrollIndicator(true);
@@ -877,7 +890,7 @@
 
         function handleTouchMove(e) {
             if (!isSliderDragging) return;
-            e.preventDefault();
+            e.preventDefault(); // Запрещаем нативный скролл и свайп вниз Telegram
         }
 
         function handleTouchEnd(e) {
@@ -887,12 +900,11 @@
             const endY = e.changedTouches[0].clientY;
             const deltaY = endY - startY;
             
-            // Минимальное расстояние для свайпа
             if (Math.abs(deltaY) > 50) {
                 if (deltaY < 0) {
-                    switchGameMode(1); // Свайп вверх - следующий режим
+                    switchGameMode(1);
                 } else {
-                    switchGameMode(-1); // Свайп вниз - предыдущий режим
+                    switchGameMode(-1);
                 }
             }
             
@@ -900,6 +912,7 @@
         }
 
         function handleMouseDown(e) {
+            if (e.target.closest('nav')) return;
             isSliderDragging = true;
             startY = e.clientY;
             updateScrollIndicator(true);
